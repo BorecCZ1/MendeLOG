@@ -1,26 +1,48 @@
-<script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
-import {useWebSocketStore} from "@/store/websocketStore";
+<template>
+  <div>
+    <h1>WebSocket Demo</h1>
+    <input v-model="message" @keyup.enter="sendMessage" placeholder="Type a message" />
+    <button @click="sendMessage">Send</button>
+    <p>Received: {{ receivedMessage }}</p>
+  </div>
+</template>
 
-const websocketStore = useWebSocketStore();
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
 
-const sendMessage = () => {
-  websocketStore.sendMessage("Hello from Vue + Pinia!");
-};
+export default defineComponent({
+  name: 'WebSocketComponent',
+  setup() {
+    const message = ref('');
+    const receivedMessage = ref('');
 
-onMounted(() => {
-  websocketStore.connect("ws://localhost:8000/ws");
-});
+    const socket = new WebSocket('ws://localhost:8000/ws');
 
-onUnmounted(() => {
-  websocketStore.close();
+    socket.onopen = () => {
+      console.log('WebSocket connected');
+    };
+
+    socket.onmessage = (event) => {
+      receivedMessage.value = event.data;
+      console.log('Message from server:', event.data);
+    };
+
+    const sendMessage = () => {
+      if (message.value) {
+        socket.send(message.value);
+        message.value = '';
+      }
+    };
+
+    return {
+      message,
+      receivedMessage,
+      sendMessage
+    };
+  }
 });
 </script>
 
-<template>
-  <div>
-    <h2>WebSocket with Pinia</h2>
-    <button @click="sendMessage">Send Message</button>
-    <div v-for="msg in websocketStore.messages" :key="msg">{{ msg }}</div>
-  </div>
-</template>
+<style scoped>
+
+</style>

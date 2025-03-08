@@ -28,3 +28,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Ignorovat IntelliJ IDEA/PhpStorm/WebStorm nastavení
+.idea/

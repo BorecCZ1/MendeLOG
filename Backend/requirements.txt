@@ -4,3 +4,6 @@ setuptools~=68.2.0
 fastapi
 uvicorn
 uvicorn[standard]
+psycopg2-binary
+psycopg2
+asyncpg

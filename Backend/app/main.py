@@ -1,6 +1,8 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict
+from typing import Dict, Any
+
+from app.db.database import db
 
 app = FastAPI()
 
@@ -12,6 +14,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/database")
+def get_database_data():
+    """Vrátí data z tabulky `articles_p_2025_01`."""
+    query = "SELECT * FROM articles_p_2025_01 LIMIT 10;"
+    rows = db.fetch_data(query)
+    return {"data": rows}
 @app.get("/data")
 def get_data() -> Dict[str, str]:
     return {"message": "Hello from FastAPI!", "status": "Toto je pecka", "version": "1.0"}

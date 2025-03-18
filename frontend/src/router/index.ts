@@ -1,10 +1,12 @@
-import { createRouter, createWebHistory } from "vue-router";
-import WebSocketComponent from "../components/websocket/WebSocketComponent.vue";
-import HomeView from "../views/HomeView.vue"
+import { createRouter, createWebHistory } from 'vue-router';
+import Dashboard from '@/views/Dashboard.vue';
+import Logs from '@/views/Logs.vue';
+import Suspicious from '@/views/Suspicious.vue';
 
 const routes = [
-    { path: "/", component: HomeView },  // hlavní stránka
-    { path: "/ws", component: WebSocketComponent },  // WebSocket komponenta
+    { path: '/', component: Dashboard },
+    { path: '/logs', component: Logs },
+    { path: '/suspicious', component: Suspicious },
 ];
 
 const router = createRouter({

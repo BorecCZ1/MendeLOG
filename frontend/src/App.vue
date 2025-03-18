@@ -1,45 +1,24 @@
 <script setup>
-import HelloWorld from './views/HomeView.vue'
-import WebSocketComponent from "@/components/websocket/WebSocketComponent.vue";
+import Sidebar from './components/navigation/Sidebar.vue';
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-      <WebSocketComponent/>
+  <div class="app-container">
+    <Sidebar />
+    <div class="content">
+      <RouterView />
     </div>
-  </header>
-
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+.app-container {
+  display: flex;
+  height: 100vh;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.content {
+  flex-grow: 1;
+  padding: 20px;
 }
 </style>

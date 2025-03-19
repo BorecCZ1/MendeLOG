@@ -75,7 +75,7 @@ onMounted(() => {
 
 <style scoped>
 .chart-container {
-  width: 100vh;
+  width: 150vh;
   height: 50vh;
   padding: 0;
   box-sizing: border-box;

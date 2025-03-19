@@ -15,6 +15,7 @@ import Sidebar from './components/navigation/Sidebar.vue';
 .app-container {
   display: flex;
   height: 100vh;
+  width: 170vh;
 }
 
 .content {

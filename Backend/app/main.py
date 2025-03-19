@@ -2,7 +2,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
 
-from app.db.database import db
+from app.db.database import db, Database
 
 app = FastAPI()
 
@@ -14,12 +14,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+async def database():
+    try:
+        db = Database()
+        db.connect_db()  # Opraveno (už nevoláme jako async)
+
+        cursor = db.get_cursor()  # Opraveno (už nevoláme jako async)
+
+        cursor.execute("SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles_p_2025_01 LIMIT 10;")
+        rows = cursor.fetchall()
+
+        cursor.close()
+        db.connection.close()  # Zavřeme připojení
+        return rows
+
+    except Exception as e:
+        print("❌ Chyba při připojení nebo dotazu:", e)
+        return []
+
 @app.get("/database")
-def get_database_data():
+async def get_database_data():
     """Vrátí data z tabulky `articles_p_2025_01`."""
-    query = "SELECT * FROM articles_p_2025_01 LIMIT 10;"
-    rows = db.fetch_data(query)
+    rows = await database()
     return {"data": rows}
+
 @app.get("/data")
 def get_data() -> Dict[str, str]:
     return {"message": "Hello from FastAPI!", "status": "Toto je pecka", "version": "1.0"}
@@ -40,4 +58,3 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket error: {e}")
     finally:
         await websocket.close()
-

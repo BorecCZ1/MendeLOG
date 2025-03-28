@@ -8,7 +8,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Povolí všechny zdroje
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -17,15 +17,15 @@ app.add_middleware(
 async def database():
     try:
         db = Database()
-        db.connect_db()  # Opraveno (už nevoláme jako async)
+        db.connect_db()
 
-        cursor = db.get_cursor()  # Opraveno (už nevoláme jako async)
+        cursor = db.get_cursor()
 
-        cursor.execute("SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles_p_2025_01 LIMIT 10;")
+        cursor.execute("""SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles LIMIT 5;""")
         rows = cursor.fetchall()
 
         cursor.close()
-        db.connection.close()  # Zavřeme připojení
+        db.connection.close()
         return rows
 
     except Exception as e:
@@ -34,9 +34,8 @@ async def database():
 
 @app.get("/database")
 async def get_database_data():
-    """Vrátí data z tabulky `articles_p_2025_01`."""
     rows = await database()
-    return {"data": rows}
+    return {"articles": rows}
 
 @app.get("/data")
 def get_data() -> Dict[str, str]:

@@ -21,5 +21,7 @@ import Sidebar from './components/navigation/Sidebar.vue';
 .content {
   flex-grow: 1;
   padding: 20px;
+  overflow-x: hidden;
 }
+
 </style>

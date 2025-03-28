@@ -16,7 +16,7 @@ import { RouterLink } from 'vue-router';
 <style scoped>
 
 .sidebar {
-  width: 250px;
+  width: 30vh;
   height: 100vh;
   background-color: #2c3e50;
   color: white;

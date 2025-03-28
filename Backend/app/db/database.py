@@ -5,11 +5,9 @@ import psycopg2.extras
 
 class Database:
     def __init__(self):
-        """Inicializace třídy, ale bez připojení."""
         self.connection = None
 
     def connect_db(self):
-        """Inicializuje připojení k databázi, pokud není otevřené."""
         if self.connection is None or self.connection.closed:
             cfg = {
                 "host": settings.DB_HOST,
@@ -30,13 +28,11 @@ class Database:
                 raise err
 
     def get_cursor(self):
-        """Vrátí nový kurzor."""
         if self.connection is None or self.connection.closed:
             self.connect_db()
         return self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     def fetch_data(self, query: str):
-        """Vykoná SELECT dotaz a vrátí výsledky jako seznam slovníků."""
         cursor = self.get_cursor()
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -44,5 +40,4 @@ class Database:
         return rows
 
 
-# Globální instance databáze
 db = Database()

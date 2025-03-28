@@ -17,11 +17,11 @@ const getColorForValue = (value: number) => {
 };
 
 const chartData = ref({
-  labels: ['14:00', '15:00', '16:00', '17:00', '18:00', '19:00'],
+  labels: ['14:00', '15:00', '16:00', '17:00', '18:00', '19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00'],
   datasets: [
     {
       label: 'Počet reportů',
-      data: [10, 15, 20, 25, 30, 35],
+      data: [10, 15, 20, 25, 30, 35,35,35,35,35,100],
       backgroundColor: (context: any) => {
 
         return getColorForValue(context.raw);
@@ -75,9 +75,9 @@ onMounted(() => {
 
 <style scoped>
 .chart-container {
-  width: 150vh;
+  width: 200vh;
   height: 50vh;
-  padding: 0;
-  box-sizing: border-box;
 }
+
+
 </style>

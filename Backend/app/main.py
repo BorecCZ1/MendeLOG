@@ -21,7 +21,25 @@ async def database():
 
         cursor = db.get_cursor()
 
-        cursor.execute("""SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles LIMIT 5;""")
+        cursor.execute("""SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles LIMIT 4;""")
+        rows = cursor.fetchall()
+
+        cursor.close()
+        db.connection.close()
+        return rows
+
+    except Exception as e:
+        print("❌ Chyba při připojení nebo dotazu:", e)
+        return []
+
+async def database_two():
+    try:
+        db = Database()
+        db.connect_db()
+
+        cursor = db.get_cursor()
+
+        cursor.execute("""SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles LIMIT 20;""")
         rows = cursor.fetchall()
 
         cursor.close()
@@ -35,6 +53,11 @@ async def database():
 @app.get("/database")
 async def get_database_data():
     rows = await database()
+    return {"articles": rows}
+
+@app.get("/logs")
+async def get_logs():
+    rows = await database_two()
     return {"articles": rows}
 
 @app.get("/data")

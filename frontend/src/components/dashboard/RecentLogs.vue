@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { fetchLogs } from "@/services/articleService";
+import { fetchRecentLogs } from "@/services/articleService";
 import {Article} from "@/model/Article";
 import ArticleComponent from "@/components/dashboard/ArticleComponent.vue";
 
 const logs = ref<Article[]>([]);
 
 onMounted(async () => {
-  const fetchedLogs = await fetchLogs();
+  const fetchedLogs = await fetchRecentLogs();
   console.log('Fetched logs:', fetchedLogs);
   logs.value = Array.isArray(fetchedLogs) ? fetchedLogs : [];
 });
@@ -26,7 +26,7 @@ onMounted(async () => {
 <style scoped>
 .recent-logs {
   width: 100%;
-  max-width: 600px;
+  max-width: 90%;
   margin: auto;
   padding: 1rem;
 }

@@ -44,15 +44,16 @@ const showFiltersPanel = ref(false);
 
     <div v-if="showFiltersPanel" class="filters-panel">
       <div class="date-filters">
-        <label for="start-date">Start Date:</label>
+        <label for="start-date" class="filter-label">Start Date:</label>
         <input v-model="startDate" type="date" id="start-date" class="date-picker" />
 
-        <label for="end-date">End Date:</label>
+        <label for="end-date" class="filter-label">End Date:</label>
         <input v-model="endDate" type="date" id="end-date" class="date-picker" />
       </div>
 
       <div class="status-filters">
-        <h4>Select Statuses</h4>
+        <br>
+        <h4 class="filter-label">Select Statuses</h4>
         <div class="status-checkboxes">
           <div v-for="status in availableStatuses" :key="status.id">
             <input
@@ -68,7 +69,7 @@ const showFiltersPanel = ref(false);
       <button @click="toggleFiltersPanel" class="close-filters-button">Close</button>
     </div>
 
-    <div v-if="filteredLogs.length === 0">
+    <div v-if="filteredLogs.length === 0" class="no-articles-found">
       <NotFound />
     </div>
 
@@ -157,7 +158,6 @@ h2 {
   filter: invert(1);
 }
 
-
 .status-checkboxes {
   display: flex;
   flex-wrap: wrap;
@@ -187,6 +187,7 @@ h2 {
   overflow-y: auto;
   max-height: calc(100vh - 80px);
   padding-right: 1vh;
+  margin-top: 1em;
 }
 
 .date-picker {
@@ -207,5 +208,16 @@ h2 {
 
 .date-picker::-webkit-calendar-picker-indicator {
   filter: invert(1);
+}
+
+.no-articles-found {
+  margin-top: 2em;
+}
+
+.filter-label {
+  font-weight: bold;
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
 }
 </style>

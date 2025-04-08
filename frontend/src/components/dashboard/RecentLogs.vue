@@ -18,6 +18,12 @@ const props = defineProps<{ logs: Article[] }>();
 
 
 <style scoped>
+
+h2 {
+  color: white;
+  font-weight: 400;
+}
+
 .recent-logs {
   width: 100%;
   max-width: 90%;

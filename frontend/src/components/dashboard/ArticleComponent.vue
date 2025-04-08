@@ -14,9 +14,9 @@ const showTitle = route.path !== '/';
 <template>
   <div class="log-item">
     <div class="log-content">
-      <h3 v-if="showTitle">Title: {{ log.article_title }}</h3>
-      <h3>Retrieved at: {{ new Date(log.retrieved_at).toLocaleString() }}</h3>
-      <p>Status: {{ log.statuses_id }} - {{ log.status_description}} </p>
+      <h3 v-if="showTitle"><span class="log-title">Title:</span> {{ log.article_title }}</h3>
+      <h3><span class="log-title">Retrieved at: </span> {{ new Date(log.retrieved_at).toLocaleString() }}</h3>
+      <p><span class="log-title">Status: </span> {{ log.statuses_id }} - {{ log.status_description}} </p>
     </div>
     <router-link :to="`/logs/${log.articles_id}`" class="details-button">Details</router-link>
   </div>
@@ -41,5 +41,11 @@ const showTitle = route.path !== '/';
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.4em;
+}
+
+.log-title {
+  font-size: 1rem;
+  font-weight: 350;
+  color: white;
 }
 </style>

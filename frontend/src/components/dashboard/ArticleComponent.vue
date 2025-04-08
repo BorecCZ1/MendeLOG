@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
 import {Article} from "@/model/Article";
+import {useRoute} from "vue-router";
 
 defineProps<{ log: Article }>();
+
+const route = useRoute();
+
+const showTitle = route.path !== '/';
+
 </script>
 
 <template>
   <div class="log-item">
     <div class="log-content">
-      <h3>{{ log.article_title }}</h3>
-      <p>{{ new Date(log.retrieved_at).toLocaleString() }}</p>
+      <h3 v-if="showTitle">Title: {{ log.article_title }}</h3>
+      <h3>Retrieved at: {{ new Date(log.retrieved_at).toLocaleString() }}</h3>
+      <p>Status: {{ log.statuses_id }} - {{ log.status_description}} </p>
     </div>
     <router-link :to="`/logs/${log.articles_id}`" class="details-button">Details</router-link>
   </div>
@@ -33,7 +40,6 @@ defineProps<{ log: Article }>();
   background-color: #007bff;
   color: white;
   padding: 0.5rem 1rem;
-  text-decoration: none;
-  border-radius: 5px;
+  border-radius: 0.4em;
 }
 </style>

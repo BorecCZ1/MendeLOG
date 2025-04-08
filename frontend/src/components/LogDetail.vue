@@ -2,16 +2,27 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Article } from "@/model/Article";
-import { fetchLogs } from "@/services/articleService";
+import {useArticleService} from "@/services/articleService";
 
 const route = useRoute();
 const router = useRouter();
 const log = ref<Article | null>(null);
 
+const {
+  fetchLogs,
+  fetchSingleLog
+} = useArticleService();
+
 onMounted(async () => {
   const logs = await fetchLogs();
-  log.value = logs.find((l) => l.articles_id === Number(route.params.id)) || null;
+  const found = logs.find((l) => l.articles_id === Number(route.params.id));
+  if (found) {
+    log.value = found;
+  } else {
+    log.value = await fetchSingleLog(Number(route.params.id));
+  }
 });
+
 
 const goBack = () => {
   router.go(-1);
@@ -48,6 +59,21 @@ const goBack = () => {
           <strong>URL:</strong>
           <p><a :href="log.url" target="_blank">{{ log.url }}</a></p>
         </div>
+        <div class="log-item">
+          <strong>Status ID:</strong>
+          <p>{{ log.statuses_id ?? 'N/A' }}</p>
+        </div>
+
+        <div class="log-item">
+          <strong>Status Description:</strong>
+          <p>{{ log.status_description ?? 'No status description' }}</p>
+        </div>
+
+        <div class="log-item">
+          <strong>Description:</strong>
+          <p>{{ log.description || 'No description available' }}</p>
+        </div>
+
       </div>
     </template>
 

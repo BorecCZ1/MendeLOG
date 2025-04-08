@@ -1,27 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { fetchRecentLogs } from "@/services/articleService";
-import {Article} from "@/model/Article";
+import { defineProps } from "vue";
+import { Article } from "@/model/Article";
 import ArticleComponent from "@/components/dashboard/ArticleComponent.vue";
 
-const logs = ref<Article[]>([]);
-
-onMounted(async () => {
-  const fetchedLogs = await fetchRecentLogs();
-  console.log('Fetched logs:', fetchedLogs);
-  logs.value = Array.isArray(fetchedLogs) ? fetchedLogs : [];
-});
+const props = defineProps<{ logs: Article[] }>();
 </script>
 
 <template>
   <div class="recent-logs">
     <h2>Recent Logs</h2>
-    <div v-if="logs.length">
-      <ArticleComponent v-for="log in logs" :key="log.articles_id" :log="log" />
+    <div v-if="props.logs.length">
+      <ArticleComponent v-for="log in props.logs" :key="log.articles_id" :log="log" />
     </div>
-    <p v-else>Loading logs...</p>
+    <p v-else class="loading-spinner"></p>
   </div>
 </template>
+
 
 <style scoped>
 .recent-logs {
@@ -30,4 +24,24 @@ onMounted(async () => {
   margin: auto;
   padding: 1rem;
 }
+.loading-spinner {
+  border: 1vh solid #f3f3f3;
+  border-top: 1vh solid #4caf50;
+  border-radius: 50%;
+  width: 30vh;
+  height: 30vh;
+  animation: spin 1s normal infinite;
+  margin: 0 auto;
+  margin-top: 2vh;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 </style>

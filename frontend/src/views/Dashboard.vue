@@ -1,31 +1,44 @@
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import BarChart from "@/components/dashboard/BarChart.vue";
 import RecentLogs from "@/components/dashboard/RecentLogs.vue";
 import StatusChecker from "@/components/dashboard/StatusChecker.vue";
+import type { Article } from "@/model/Article";
+import {useArticleService} from "@/services/articleService";
+
+const {
+  fetchLogs
+} = useArticleService();
+
+const logs = ref<Article[]>([]);
+
+onMounted(async () => {
+  logs.value = await fetchLogs();
+});
 </script>
 
 <template>
   <div class="dashboard">
-
     <div class="left-section">
       <div class="chart">
         <BarChart />
       </div>
       <div class="logs">
-        <RecentLogs />
+        <RecentLogs :logs="logs" />
       </div>
     </div>
 
     <div class="right-section">
       <div class="status">
-        <StatusChecker />
+        <StatusChecker :logs="logs" />
       </div>
       <div class="status">
-        <StatusChecker />
+        <StatusChecker :logs="logs" />
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .dashboard {

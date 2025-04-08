@@ -1,8 +1,8 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict, Any
+from typing import Dict
 
-from app.db.database import db, Database
+from app.db.database_queries import get_basic_articles, get_detailed_articles_with_sentiments
 
 app = FastAPI()
 
@@ -14,51 +14,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def database():
-    try:
-        db = Database()
-        db.connect_db()
-
-        cursor = db.get_cursor()
-
-        cursor.execute("""SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles LIMIT 4;""")
-        rows = cursor.fetchall()
-
-        cursor.close()
-        db.connection.close()
-        return rows
-
-    except Exception as e:
-        print("❌ Chyba při připojení nebo dotazu:", e)
-        return []
-
-async def database_two():
-    try:
-        db = Database()
-        db.connect_db()
-
-        cursor = db.get_cursor()
-
-        cursor.execute("""SELECT articles_id, article_title, retrieved_at, published_at, lang, domain, url, articles_categories_id FROM articles LIMIT 20;""")
-        rows = cursor.fetchall()
-
-        cursor.close()
-        db.connection.close()
-        return rows
-
-    except Exception as e:
-        print("❌ Chyba při připojení nebo dotazu:", e)
-        return []
-
 @app.get("/database")
 async def get_database_data():
-    rows = await database()
+    rows = await get_basic_articles()
     return {"articles": rows}
 
 @app.get("/logs")
 async def get_logs():
-    rows = await database_two()
+    rows = await get_detailed_articles_with_sentiments()
     return {"articles": rows}
+
+@app.get("/logs/{article_id}")
+async def get_single_log(article_id: int):
+    rows = await get_detailed_articles_with_sentiments()
+    for article in rows:
+        if article["articles_id"] == article_id:
+            return {"article": article}
+    return {"article": None}
 
 @app.get("/data")
 def get_data() -> Dict[str, str]:
@@ -80,3 +52,4 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket error: {e}")
     finally:
         await websocket.close()
+

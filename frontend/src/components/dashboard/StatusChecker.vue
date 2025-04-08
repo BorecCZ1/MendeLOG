@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { fetchLogs } from "@/services/articleService";
+import { defineProps, computed } from "vue";
+import type { Article } from "@/model/Article";
 
-const lastRetrieved = ref<Date | null>(null);
+const props = defineProps<{ logs: Article[] }>();
 
-onMounted(async () => {
-  const logs = await fetchLogs();
-  if (logs.length > 0) {
-    lastRetrieved.value = new Date(logs[0].retrieved_at);
-  }
+const lastRetrieved = computed(() => {
+  if (!props.logs.length) return null;
+  return new Date(props.logs[0].retrieved_at);
 });
 
 const status = computed(() => {
@@ -28,6 +26,7 @@ const status = computed(() => {
   return { color: "#dc3545", text: "Critical issue", icon: "❌", border: "2px solid #dc3545", time: diffMinutes };
 });
 </script>
+
 
 <template>
   <div class="status-container">

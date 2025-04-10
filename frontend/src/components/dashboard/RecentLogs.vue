@@ -30,6 +30,7 @@ h2 {
   margin: auto;
   padding: 1rem;
 }
+
 .loading-spinner {
   border: 1vh solid #f3f3f3;
   border-top: 1vh solid #4caf50;

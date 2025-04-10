@@ -4,7 +4,7 @@ import BarChart from "@/components/dashboard/BarChart.vue";
 import RecentLogs from "@/components/dashboard/RecentLogs.vue";
 import StatusChecker from "@/components/dashboard/StatusChecker.vue";
 import type { Article } from "@/model/Article";
-import {useArticleService} from "@/services/articleService";
+import { useArticleService } from "@/services/articleService";
 
 const {
   fetchLogs
@@ -21,7 +21,7 @@ onMounted(async () => {
   <div class="dashboard">
     <div class="left-section">
       <div class="chart">
-        <BarChart />
+        <BarChart :logs="logs" />
       </div>
       <div class="logs">
         <RecentLogs :logs="logs" />
@@ -30,15 +30,16 @@ onMounted(async () => {
 
     <div class="right-section">
       <div class="status">
-        <StatusChecker :logs="logs" />
+        <!-- Předání prop title s hodnotou "Afrodita" -->
+        <StatusChecker :logs="logs" title="Afrodita" />
       </div>
       <div class="status">
-        <StatusChecker :logs="logs" />
+        <!-- Předání prop title s hodnotou "Dita" -->
+        <StatusChecker :logs="logs" title="Dita" />
       </div>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .dashboard {

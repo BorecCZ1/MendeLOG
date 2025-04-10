@@ -1,12 +1,32 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
+import { useStatisticsService } from "@/services/statisticsService";
 
+const { getBadStatusCountThisMonth, getMostFrequentBadStatus, getLastRecordedBadStatus } = useStatisticsService();
 
+const badStatusCount = ref(0);
+const mostFrequentBadStatus = ref<string | null>(null);
+const lastRecordedBadStatus = ref<string | null>(null);
+
+onMounted(() => {
+  badStatusCount.value = getBadStatusCountThisMonth();
+  mostFrequentBadStatus.value = getMostFrequentBadStatus();
+  lastRecordedBadStatus.value = getLastRecordedBadStatus();
+});
 </script>
 
 <template>
   <div class="statistics-panel">
     <h2>Statistics</h2>
-    <p>Tady bude neco uplne ze crazy jak cyp nojoooo </p>
+    <p><strong>Bad status count per this month:</strong> {{ badStatusCount }}</p>
+
+    <p v-if="mostFrequentBadStatus">
+      <strong>Most frequent bad status:</strong> {{ mostFrequentBadStatus }}
+    </p>
+
+    <p v-if="lastRecordedBadStatus">
+      <strong>Last recorded bad status:</strong> {{ lastRecordedBadStatus }}
+    </p>
 
   </div>
 </template>
@@ -28,4 +48,8 @@ h2 {
   text-align: center;
 }
 
+p {
+  font-size: 1.2rem;
+  margin-bottom: 1vh;
+}
 </style>

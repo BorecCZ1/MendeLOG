@@ -2,7 +2,10 @@
 import { defineProps, computed } from "vue";
 import type { Article } from "@/model/Article";
 
-const props = defineProps<{ logs: Article[] }>();
+const props = defineProps<{
+  logs: Article[];
+  title: string;
+}>();
 
 const lastRetrieved = computed(() => {
   if (!props.logs.length) return null;
@@ -27,10 +30,10 @@ const status = computed(() => {
 });
 </script>
 
-
 <template>
   <div class="status-container">
-    <h2>System Status</h2>
+
+    <h2>{{ props.title }}</h2>
 
     <div class="status-box" :style="{ border: status.border }">
       <span class="status-icon">{{ status.icon }}</span>

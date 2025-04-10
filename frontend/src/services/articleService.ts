@@ -1,5 +1,5 @@
-import { ref, watch } from "vue";
-import { Article } from "@/model/Article";
+import {ref, watch} from "vue";
+import {Article} from "@/model/Article";
 import api from "./api";
 
 export const useArticleService = () => {
@@ -23,15 +23,20 @@ export const useArticleService = () => {
     const fetchLogs = async (): Promise<Article[]> => {
         try {
             const response = await api.get("/logs");
-            console.log("FETCHUJU LOGY 1X")
-            console.log(response.data.articles);
+            const articles = response.data.articles;
 
-            return response.data.articles;
+            console.log("FETCHUJU LOGY 1X");
+            console.log(articles);
+
+            return articles.sort((a: Article, b: Article) => {
+                return new Date(b.retrieved_at).getTime() - new Date(a.retrieved_at).getTime();
+            });
         } catch (error) {
             console.error("❌ Error fetching logs:", error);
             return [];
         }
     };
+
 
     const fetchRecentLogs = async (): Promise<Article[]> => {
         try {

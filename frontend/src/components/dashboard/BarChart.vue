@@ -1,70 +1,23 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Chart, CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale, BarController } from 'chart.js';
+import { ref, onMounted, watch } from 'vue';
+import type { Article } from "@/model/Article";
+import { useChartService } from "@/services/chartService";
+import {Chart} from "chart.js";
 
-Chart.register(CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale, BarController);
-
+const props = defineProps<{ logs: Article[] }>();
 const chartRef = ref<HTMLCanvasElement | null>(null);
+let chartInstance: Chart | null = null;
 
-const getColorForValue = (value: number) => {
-  if (value <= 15) {
-    return 'rgba(255, 99, 132, 0.8)';
-  } else if (value <= 25) {
-    return 'rgba(255, 206, 86, 0.8)';
-  } else {
-    return 'rgba(75, 192, 192, 0.8)';
+const { renderChart } = useChartService();
+
+const render = () => {
+  if (chartRef.value) {
+    chartInstance = renderChart(chartRef.value, props.logs, chartInstance);
   }
 };
 
-const chartData = ref({
-  labels: ['14:00', '15:00', '16:00', '17:00', '18:00', '19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00','19:00'],
-  datasets: [
-    {
-      label: 'Počet reportů',
-      data: [10, 15, 20, 25, 30, 35,35,35,35,35,100],
-      backgroundColor: (context: any) => {
-
-        return getColorForValue(context.raw);
-      },
-      borderColor: (context: any) => {
-        return getColorForValue(context.raw);
-      },
-      borderWidth: 1
-    }
-  ]
-});
-
-onMounted(() => {
-  if (chartRef.value) {
-    new Chart(chartRef.value, {
-      type: 'bar',
-      data: chartData.value,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-        },
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Čas',
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Počet reportů',
-            },
-            min: 0,
-          }
-        }
-      },
-    });
-  }
-});
+onMounted(render);
+watch(() => props.logs, render, { deep: true });
 </script>
 
 <template>
@@ -75,9 +28,7 @@ onMounted(() => {
 
 <style scoped>
 .chart-container {
-  width: 111vh;
-  height: 49vh;
+  width: 100%;
+  height: 100%;
 }
-
-
 </style>

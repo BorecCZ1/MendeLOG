@@ -77,7 +77,7 @@ const goBack = () => {
       </div>
     </template>
 
-    <p v-else>Loading...</p>
+    <p v-else class="loading-spinner"></p>
   </div>
 </template>
 
@@ -123,5 +123,21 @@ strong {
 
 p {
   font-size: 1.1rem;
+}
+
+.loading-spinner {
+  border: 2vh solid #f3f3f3;
+  border-top: 2vh solid #4caf50;
+  border-radius: 70%;
+  width: 50vh;
+  height: 50vh;
+  animation: spin 1s infinite linear;
+  margin: 0 auto;
+  margin-top: 2vh;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

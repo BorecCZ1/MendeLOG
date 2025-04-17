@@ -17,13 +17,25 @@ const props = defineProps<{
       <span class="icon">{{ activity.level === "error" ? "❌" : "⚠️" }}</span>
       <h3>{{ activity.name }}</h3>
     </div>
-    <p class="meta">
-      Level: <strong>{{ activity.level }}</strong> ·
-      {{ new Date(activity.timestamp).toLocaleString() }}
-    </p>
+
+    <div class="meta">
+      <span class="meta-item level">
+        <span class="label">Level:</span>
+        <span class="value">
+          {{ activity.level === "error" ? "❌ Error" : "⚠️ Warning" }}
+        </span>
+      </span>
+          <span class="meta-item time">
+        <span class="label">Created:</span>
+        <span class="value">
+          {{ new Date(activity.timestamp).toLocaleString() }}
+        </span>
+      </span>
+    </div>
+
 
     <button class="toggle-btn" @click="onToggleExpanded(activity.id!)">
-      {{ expanded === activity.id ? '🔽 Hide Details' : '🔼 Show Details' }}
+      {{ expanded === activity.id ? '🔼 Hide Details' : '🔽 Show Details' }}
     </button>
 
     <transition name="fade">
@@ -75,10 +87,35 @@ const props = defineProps<{
 }
 
 .meta {
-  font-size: 0.85em;
-  color: #aaa;
-  margin-bottom: 0.8em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  background-color: #2a2a2a;
+  padding: 0.75em 1em;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 0.95em;
+  margin-bottom: 1em;
+  box-shadow: inset 0 0 3px #000;
 }
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-item .label {
+  font-weight: bold;
+  color: #aaa;
+  font-size: 0.9em;
+}
+
+.meta-item .value {
+  color: #f0f0f0;
+  font-size: 0.95em;
+}
+
 
 .toggle-btn {
   background: none;

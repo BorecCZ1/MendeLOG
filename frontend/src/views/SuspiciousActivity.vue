@@ -44,14 +44,19 @@ const solvedActivities = computed(() => activities.value.filter(a => a.solved));
 <template>
   <div class="suspicious_container">
     <div class="header">
-      <h2>Suspicious Activities</h2>
       <button class="toggle-form" @click="showForm = !showForm">
-        {{ showForm ? "➖ Close Form" : "➕ Add Activity" }}
+        + Add Suspicious Activity
       </button>
+
     </div>
 
     <transition name="fade">
-      <ActivityForm v-if="showForm" @created="addActivity" />
+      <div v-if="showForm" class="modal-backdrop" @click.self="showForm = false">
+        <div class="modal">
+          <button class="modal-close" @click="showForm = false">×</button>
+          <ActivityForm @created="addActivity" />
+        </div>
+      </div>
     </transition>
 
     <div class="columns">
@@ -92,19 +97,59 @@ const solvedActivities = computed(() => activities.value.filter(a => a.solved));
   justify-content: space-between;
   align-items: center;
 }
-
 .toggle-form {
-  background-color: #2c2c2c;
-  border: 1px solid #444;
-  color: #eee;
-  padding: 0.5em 1em;
-  border-radius: 1vh;
+  background-color: #3a5f3a;
+  border: none;
+  color: #fff;
+  padding: 0.75em 1.5em;
+  border-radius: 12px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: 0.2s ease;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transition: background 0.3s ease;
 }
 
 .toggle-form:hover {
-  background-color: #444;
+  background-color: #4b7c4b;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  position: relative;
+  background-color: #1e1e1e;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 3rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #fff;
 }
 
 .columns {

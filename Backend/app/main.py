@@ -15,6 +15,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+"""
+LOGS/ARTICLES ENDPOINTS
+"""
+
+@app.get("/logs")
+async def get_logs():
+    rows = await get_detailed_articles_with_sentiments()
+    return {"articles": rows}
+
+@app.get("/logs/{article_id}")
+async def get_single_log(article_id: int):
+    rows = await get_detailed_articles_with_sentiments()
+    for article in rows:
+        if article["articles_id"] == article_id:
+            return {"article": article}
+    return {"article": None}
+
+"""
+SUSPICIOUS ACTIVITY ENDPOINTS
+"""
+
 @app.get("/suspicious-activity")
 async def list_activities():
     try:
@@ -45,24 +66,9 @@ async def delete_activity(doc_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/database")
-async def get_database_data():
-    rows = await get_basic_articles()
-    return {"articles": rows}
-
-@app.get("/logs")
-async def get_logs():
-    rows = await get_detailed_articles_with_sentiments()
-    return {"articles": rows}
-
-@app.get("/logs/{article_id}")
-async def get_single_log(article_id: int):
-    rows = await get_detailed_articles_with_sentiments()
-    for article in rows:
-        if article["articles_id"] == article_id:
-            return {"article": article}
-    return {"article": None}
-
+"""
+Day one bro
+"""
 @app.get("/")
 def main():
     return {"message": "Hello from FastAPI"}

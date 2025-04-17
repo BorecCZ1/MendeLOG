@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
+import {computed, defineProps} from "vue";
 import { SuspiciousActivity } from "@/model/SuspiciousActivity";
 import ActivityCard from "@/components/suspicious_activity/ActivityCard.vue";
 
@@ -11,14 +11,28 @@ const props = defineProps<{
   onDelete: (id: string) => void;
   onToggleExpanded: (id: string) => void;
 }>();
+
+const sortedActivities = computed(() => {
+  return [...props.activities].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+});
+
 </script>
+
 <template>
   <div class="column">
-    <h2>{{ title }}</h2>
+    <div class="column-title">
+      <h2>{{ title }}</h2>
+    </div>
     <div class="scrollable">
-      <div class="grid">
+      <div v-if="sortedActivities.length === 0" class="empty-state">
+        <p>
+          V tuto chvíli nejsou žádné podezřelé aktivity.<br/>
+          Všechno vypadá v pořádku.
+        </p>
+      </div>
+      <div v-else class="grid">
         <ActivityCard
-            v-for="activity in activities"
+            v-for="activity in sortedActivities"
             :key="activity.id"
             :activity="activity"
             :expanded="expanded"
@@ -36,27 +50,54 @@ const props = defineProps<{
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1em;
-  padding: 1em;
-  height: 100%;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  max-height: 100%;
+  box-shadow: 0 0 16px rgba(0,0,0,0.3);
 }
 
-h2 {
-  color: #ddd;
-  font-size: 1.4rem;
-  margin-bottom: 0.5em;
+.column-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
 }
 
 .scrollable {
   flex: 1;
   overflow-y: auto;
-  max-height: 70vh;
-  padding-right: 0.3rem; /* optický prostor vedle scrollbar */
+  max-height: 75vh;
+  padding-right: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.scrollable::-webkit-scrollbar {
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 4px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(30vh, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
+
+.empty-state {
+  text-align: center;
+  color: #aaa;
+  font-size: 1.1rem;
+  padding: 2rem 1rem;
+  border: 2px dashed #444;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+
 </style>

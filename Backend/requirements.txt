@@ -7,3 +7,4 @@ uvicorn[standard]
 psycopg2-binary
 psycopg2
 asyncpg
+firebase-admin

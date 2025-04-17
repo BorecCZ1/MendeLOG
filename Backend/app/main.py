@@ -1,8 +1,9 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict
 
 from app.db.database_queries import get_basic_articles, get_detailed_articles_with_sentiments
+from app.firebase.database_firestore import db_firestore
+from app.models.suspicious_activity import SuspiciousActivity
 
 app = FastAPI()
 
@@ -13,6 +14,36 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/suspicious-activity")
+async def list_activities():
+    try:
+        activities_ref = db_firestore.collection("suspicious_activity").stream()
+        activities = [
+            {**doc.to_dict(), "id": doc.id}
+            for doc in activities_ref
+        ]
+        return activities
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/suspicious-activity")
+async def report_activity(activity: SuspiciousActivity):
+    try:
+        doc_ref = db_firestore.collection("suspicious_activity").add(activity.dict())
+        return {"status": "ok", "id": doc_ref[1].id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/suspicious-activity/{doc_id}")
+async def delete_activity(doc_id: str):
+    try:
+        db_firestore.collection("suspicious_activity").document(doc_id).delete()
+        return {"status": "deleted", "id": doc_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/database")
 async def get_database_data():
@@ -32,24 +63,6 @@ async def get_single_log(article_id: int):
             return {"article": article}
     return {"article": None}
 
-@app.get("/data")
-def get_data() -> Dict[str, str]:
-    return {"message": "Hello from FastAPI!", "status": "Toto je pecka", "version": "1.0"}
-
 @app.get("/")
 def main():
     return {"message": "Hello from FastAPI"}
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        while True:
-            data = await websocket.receive_text()
-            print(f"Received message: {data}")
-            await websocket.send_text(f"Message received: {data}")
-    except Exception as e:
-        print(f"WebSocket error: {e}")
-    finally:
-        await websocket.close()
-

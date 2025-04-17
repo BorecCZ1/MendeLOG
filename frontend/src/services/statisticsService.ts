@@ -1,4 +1,3 @@
-import { ref } from "vue";
 import { Article } from "@/model/Article";
 import {useArticleService} from "./articleService";
 

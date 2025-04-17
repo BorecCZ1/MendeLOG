@@ -8,7 +8,7 @@ import { RouterLink } from 'vue-router';
     <nav>
       <RouterLink to="/" class="nav-item">Dashboard</RouterLink>
       <RouterLink to="/logs" class="nav-item">Logs</RouterLink>
-      <RouterLink to="/suspicious" class="nav-item">Suspicious Activity</RouterLink>
+      <RouterLink to="/suspicious_activity" class="nav-item">Suspicious Activity</RouterLink>
     </nav>
   </div>
 </template>

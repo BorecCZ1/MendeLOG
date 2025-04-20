@@ -2,6 +2,7 @@ import api from "./api";
 import {SuspiciousActivity} from "@/model/SuspiciousActivity";
 
 export const useSuspiciousActivityService = {
+
     async getAll(): Promise<SuspiciousActivity[]> {
         const res = await api.get("/suspicious-activity");
         return res.data;
@@ -16,4 +17,7 @@ export const useSuspiciousActivityService = {
         const res = await api.delete(`/suspicious-activity/${id}`);
         return res.data;
     },
+
+
+
 };

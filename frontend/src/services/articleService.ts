@@ -94,6 +94,14 @@ export const useArticleService = () => {
     };
 
     watch([searchQuery, startDate, endDate, selectedStatuses], () => {
+        if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) {
+            endDate.value = startDate.value;
+        }
+
+        if (endDate.value && startDate.value && new Date(endDate.value) < new Date(startDate.value)) {
+            startDate.value = endDate.value;
+        }
+
         applyFilters();
     });
 

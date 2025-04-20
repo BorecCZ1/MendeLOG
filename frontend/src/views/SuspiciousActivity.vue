@@ -1,44 +1,37 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
 import { SuspiciousActivity } from "@/model/SuspiciousActivity";
-import { suspiciousActivityController } from "@/controllers/suspiciousActivityController";
 import ActivityColumn from "@/components/suspicious_activity/ActivityColumn.vue";
 import ActivityForm from "@/components/suspicious_activity/ActivityForm.vue";
+import {useActivities} from "@/services/activityService";
 
-const activities = ref<SuspiciousActivity[]>([]);
-const expanded = ref<string | null>(null);
+const { activities,
+  isLoading,
+  fetchActivities,
+  toggleSolved,
+  deleteActivity,
+  addActivity
+} = useActivities();
+
 const showForm = ref(false);
+const expanded = ref<string | null>(null);
 
-const fetchActivities = async () => {
-  activities.value = await suspiciousActivityController.fetchAll();
-};
-
-const toggleSolved = async (activity: SuspiciousActivity) => {
-  const updated = { ...activity, solved: !activity.solved };
-  await suspiciousActivityController.createActivity(updated);
-  if (activity.id) await suspiciousActivityController.deleteActivity(activity.id);
-  await fetchActivities();
-};
-
-const deleteActivity = async (id: string) => {
-  await suspiciousActivityController.deleteActivity(id);
-  await fetchActivities();
-};
-
-const addActivity = async (activity: SuspiciousActivity) => {
-  await suspiciousActivityController.createActivity(activity);
-  showForm.value = false;
-  await fetchActivities();
-};
-
-const toggleExpanded = (id: string) => {
-  expanded.value = expanded.value === id ? null : id;
+const handleAddActivity = async (activity: SuspiciousActivity) => {
+  const success = await addActivity(activity);
+  if (success) {
+    showForm.value = false;
+  }
 };
 
 onMounted(fetchActivities);
 
 const unsolvedActivities = computed(() => activities.value.filter(a => !a.solved));
 const solvedActivities = computed(() => activities.value.filter(a => a.solved));
+
+const toggleExpanded = (id: string) => {
+  expanded.value = expanded.value === id ? null : id;
+};
+
 </script>
 
 <template>
@@ -54,7 +47,7 @@ const solvedActivities = computed(() => activities.value.filter(a => a.solved));
       <div v-if="showForm" class="modal-backdrop" @click.self="showForm = false">
         <div class="modal">
           <button class="modal-close" @click="showForm = false">×</button>
-          <ActivityForm @created="addActivity" />
+          <ActivityForm @created="handleAddActivity" />
         </div>
       </div>
     </transition>
@@ -67,6 +60,7 @@ const solvedActivities = computed(() => activities.value.filter(a => a.solved));
           :onToggleSolved="toggleSolved"
           :onDelete="deleteActivity"
           :onToggleExpanded="toggleExpanded"
+          :isLoading="isLoading"
       />
       <ActivityColumn
           title="✅ Solved"
@@ -75,6 +69,7 @@ const solvedActivities = computed(() => activities.value.filter(a => a.solved));
           :onToggleSolved="toggleSolved"
           :onDelete="deleteActivity"
           :onToggleExpanded="toggleExpanded"
+          :isLoading="isLoading"
       />
     </div>
   </div>
@@ -166,11 +161,4 @@ const solvedActivities = computed(() => activities.value.filter(a => a.solved));
   min-width: 0;
 }
 
-
-.activity-column-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(3vh, 1fr));
-  gap: 1rem;
-  width: 100%;
-}
 </style>

@@ -2,6 +2,7 @@
 import {computed, defineProps} from "vue";
 import { SuspiciousActivity } from "@/model/SuspiciousActivity";
 import ActivityCard from "@/components/suspicious_activity/ActivityCard.vue";
+import {useActivities} from "@/services/activityService";
 
 const props = defineProps<{
   title: string;
@@ -10,7 +11,12 @@ const props = defineProps<{
   onToggleSolved: (activity: SuspiciousActivity) => void;
   onDelete: (id: string) => void;
   onToggleExpanded: (id: string) => void;
+  isLoading: boolean;
 }>();
+
+const {
+  initialLoad
+} = useActivities()
 
 const sortedActivities = computed(() => {
   return [...props.activities].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -24,12 +30,15 @@ const sortedActivities = computed(() => {
       <h2>{{ title }}</h2>
     </div>
     <div class="scrollable">
-      <div v-if="sortedActivities.length === 0" class="empty-state">
+      <p v-if="isLoading && initialLoad" class="loading-spinner"></p>
+
+      <div v-else-if="sortedActivities.length === 0" class="empty-state">
         <p>
-          V tuto chvíli nejsou žádné podezřelé aktivity.<br/>
+          V tuto chvíli nejsou žádné podezřelé aktivity.<br />
           Všechno vypadá v pořádku.
         </p>
       </div>
+
       <div v-else class="grid">
         <ActivityCard
             v-for="activity in sortedActivities"
@@ -42,6 +51,7 @@ const sortedActivities = computed(() => {
         />
       </div>
     </div>
+
   </div>
 </template>
 
@@ -99,5 +109,24 @@ const sortedActivities = computed(() => {
   background-color: rgba(255, 255, 255, 0.02);
 }
 
+.loading-spinner {
+  border: 1vh solid #f3f3f3;
+  border-top: 1vh solid #4caf50;
+  border-radius: 50%;
+  width: 30vh;
+  height: 30vh;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+  margin-top: 2vh;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 </style>

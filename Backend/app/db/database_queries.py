@@ -1,87 +1,87 @@
-from app.db.database import Database
+from datetime import datetime, timedelta, timezone
+from app.db.database import db
 
-
-async def get_basic_articles(limit: int = 4):
+async def refresh_materialized_view_if_needed():
     try:
-        db = Database()
         db.connect_db()
         cursor = db.get_cursor()
 
-        cursor.execute(f"""
-            SELECT 
-                a.articles_id,
-                a.article_title,
-                a.retrieved_at,
-                a.published_at,
-                a.lang,
-                a.domain,
-                a.url,
-                a.articles_categories_id,
-                s.statuses_id,
-                s.params ->> 'description' AS description,
-                st.description AS status_description
-            FROM articles a
-            LEFT JOIN articles_sentiments s ON a.articles_id = s.articles_id
-            LEFT JOIN statuses st ON s.statuses_id = st.statuses_id
-            LIMIT {limit};
+        cursor.execute("""
+            SELECT EXISTS (
+                SELECT 1 FROM pg_matviews
+                WHERE matviewname = 'detailed_articles_with_sentiments_mv'
+            );
         """)
-        rows = cursor.fetchall()
+        exists = cursor.fetchone()['exists']
+
+        if not exists:
+            print("🆕 Materialized view neexistuje, vytvářím ji...")
+            cursor.execute("""
+                CREATE MATERIALIZED VIEW detailed_articles_with_sentiments_mv AS
+                SELECT
+                    a.articles_id,
+                    a.article_title,
+                    a.retrieved_at,
+                    a.published_at,
+                    a.lang,
+                    a.domain,
+                    a.url,
+                    a.articles_categories_id,
+                    s.statuses_id,
+                    s.params ->> 'description' AS description,
+                    st.description AS status_description
+                FROM articles a
+                INNER JOIN articles_sentiments s ON a.articles_id = s.articles_id
+                INNER JOIN statuses st ON s.statuses_id = st.statuses_id
+                ORDER BY a.retrieved_at DESC
+                LIMIT 2000;
+            """)
+
+            cursor.execute("""
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_detailed_articles_mv
+                ON detailed_articles_with_sentiments_mv (articles_id, statuses_id);
+            """)
+
+            print("✅ View vytvořena.")
+        else:
+            cursor.execute("""
+                SELECT MAX(retrieved_at) FROM detailed_articles_with_sentiments_mv;
+            """)
+            latest_retrieved_at = cursor.fetchone()['max']
+
+            if not latest_retrieved_at:
+                should_refresh = True
+            else:
+                age = datetime.now(timezone.utc) - latest_retrieved_at
+                should_refresh = age > timedelta(minutes=10000) #TODO změnit na požadovaný počet minut
+
+            if should_refresh:
+                print("🔁 Obnovuju materialized view (starší než 5 minut)")
+                cursor.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY detailed_articles_with_sentiments_mv;")
+            else:
+                print("✅ Materialized view je čerstvý")
+
+        db.connection.commit()
         cursor.close()
         db.connection.close()
-        return rows
 
     except Exception as e:
-        print("❌ Chyba při načítání článků:", e)
-        return []
+        print("❌ Chyba při kontrole/obnovení materialized view:", e)
 
 
 async def get_detailed_articles_with_sentiments(limit: int = 50):
     try:
-        db = Database()
+        await refresh_materialized_view_if_needed()
+
         db.connect_db()
         cursor = db.get_cursor()
 
-        #Jakoby funkcni ale trva to jak cyp coz je teply, poresit
-        # cursor.execute(f"""
-        #    SELECT
-        #        a.articles_id,
-        #        a.article_title,
-        #        a.retrieved_at,
-        #       a.published_at,
-        #       a.lang,
-        #       a.domain,
-        #       a.url,
-        #       a.articles_categories_id,
-        #       s.statuses_id,
-        #       s.params ->> 'description' AS description,
-        #       st.description AS status_description
-        #   FROM articles a
-        #   INNER JOIN articles_sentiments s ON a.articles_id = s.articles_id
-        #   INNER JOIN statuses st ON s.statuses_id = st.statuses_id
-        #   ORDER BY a.retrieved_at DESC
-        #   LIMIT {limit};
-        # """
-
         cursor.execute(f"""
-            SELECT 
-                a.articles_id,
-                a.article_title,
-                a.retrieved_at,
-                a.published_at,
-                a.lang,
-                a.domain,
-                a.url,
-                a.articles_categories_id,
-                s.statuses_id,
-                s.params ->> 'description' AS description,
-                st.description AS status_description
-            FROM articles a
-            RIGHT JOIN articles_sentiments s ON a.articles_id = s.articles_id
-            RIGHT JOIN statuses st ON s.statuses_id = st.statuses_id
-            LIMIT {limit};
+            SELECT * 
+            FROM detailed_articles_with_sentiments_mv;
         """)
-
         rows = cursor.fetchall()
+
         cursor.close()
         db.connection.close()
         return rows
@@ -89,3 +89,81 @@ async def get_detailed_articles_with_sentiments(limit: int = 50):
     except Exception as e:
         print("❌ Chyba při načítání článků se sentimenty:", e)
         return []
+
+async def get_single_detailed_article_with_sentiment(article_id: int):
+    try:
+
+        db.connect_db()
+        cursor = db.get_cursor()
+
+        cursor.execute("""
+            SELECT *
+            FROM detailed_articles_with_sentiments_mv
+            WHERE articles_id = %s;
+        """, (article_id,))
+
+        row = cursor.fetchone()
+
+        cursor.close()
+        db.connection.close()
+        return row
+
+    except Exception as e:
+        print("❌ Chyba při načítání jednoho článku:", e)
+        return None
+
+
+# async def get_detailed_articles_with_sentiments(limit: int = 50):
+#     try:
+#         db = Database()
+#         db.connect_db()
+#         cursor = db.get_cursor()
+#
+#         #Jakoby funkcni ale trva to jak cyp coz je teply, poresit
+#         # cursor.execute(f"""
+#         #    SELECT
+#         #        a.articles_id,
+#         #        a.article_title,
+#         #        a.retrieved_at,
+#         #       a.published_at,
+#         #       a.lang,
+#         #       a.domain,
+#         #       a.url,
+#         #       a.articles_categories_id,
+#         #       s.statuses_id,
+#         #       s.params ->> 'description' AS description,
+#         #       st.description AS status_description
+#         #   FROM articles a
+#         #   INNER JOIN articles_sentiments s ON a.articles_id = s.articles_id
+#         #   INNER JOIN statuses st ON s.statuses_id = st.statuses_id
+#         #   ORDER BY a.retrieved_at DESC
+#         #   LIMIT {limit};
+#         # """
+#
+#         cursor.execute(f"""
+#             SELECT
+#                 a.articles_id,
+#                 a.article_title,
+#                 a.retrieved_at,
+#                 a.published_at,
+#                 a.lang,
+#                 a.domain,
+#                 a.url,
+#                 a.articles_categories_id,
+#                 s.statuses_id,
+#                 s.params ->> 'description' AS description,
+#                 st.description AS status_description
+#             FROM articles a
+#             RIGHT JOIN articles_sentiments s ON a.articles_id = s.articles_id
+#             RIGHT JOIN statuses st ON s.statuses_id = st.statuses_id
+#             LIMIT {limit};
+#         """)
+#
+#         rows = cursor.fetchall()
+#         cursor.close()
+#         db.connection.close()
+#         return rows
+#
+#     except Exception as e:
+#         print("❌ Chyba při načítání článků se sentimenty:", e)
+#         return []

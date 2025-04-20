@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import {onMounted, ref, watch} from "vue";
 import { useArticleService } from "@/services/articleService";
 import ArticleComponent from "@/components/dashboard/ArticleComponent.vue";
 import NotFound from "@/components/NoArticlesFound.vue";
+
+const isLoading = ref(true);
 
 const {
   filteredLogs,
@@ -15,8 +17,10 @@ const {
   resetFilters,
 } = useArticleService();
 
-onMounted(() => {
-  fetchAndFilterLogs();
+onMounted(async () => {
+  isLoading.value = true;
+  await fetchAndFilterLogs();
+  isLoading.value = false;
 });
 
 const toggleFiltersPanel = () => {
@@ -24,6 +28,19 @@ const toggleFiltersPanel = () => {
 };
 
 const showFiltersPanel = ref(false);
+
+watch(startDate, (newStart) => {
+  if (newStart && endDate.value && new Date(newStart) > new Date(endDate.value)) {
+    endDate.value = newStart;
+  }
+});
+
+watch(endDate, (newEnd) => {
+  if (newEnd && startDate.value && new Date(newEnd) < new Date(startDate.value)) {
+    startDate.value = newEnd;
+  }
+});
+
 </script>
 
 <template>
@@ -45,11 +62,22 @@ const showFiltersPanel = ref(false);
     <div v-if="showFiltersPanel" class="filters-panel">
       <div class="date-filters">
         <label for="start-date" class="filter-label">Start Date:</label>
-        <input v-model="startDate" type="date" id="start-date" class="date-picker" />
+        <input
+            v-model="startDate"
+            type="date"
+            id="start-date"
+            class="date-picker"
+            :max="endDate || undefined"
+        />
 
         <label for="end-date" class="filter-label">End Date:</label>
-        <input v-model="endDate" type="date" id="end-date" class="date-picker" />
-      </div>
+        <input
+            v-model="endDate"
+            type="date"
+            id="end-date"
+            class="date-picker"
+            :min="startDate || undefined"
+        />      </div>
 
       <div class="status-filters">
         <br>
@@ -69,7 +97,11 @@ const showFiltersPanel = ref(false);
       <button @click="toggleFiltersPanel" class="close-filters-button">Close</button>
     </div>
 
-    <div v-if="filteredLogs.length === 0" class="no-articles-found">
+    <div v-if="isLoading">
+      <p class="loading-spinner"></p>
+    </div>
+
+    <div v-else-if="filteredLogs.length === 0" class="no-articles-found">
       <NotFound />
     </div>
 
@@ -220,4 +252,24 @@ h2 {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
 }
+
+.loading-spinner {
+  border: 1vh solid #f3f3f3;
+  border-top: 1vh solid #4caf50;
+  border-radius: 50%;
+  width: 30vh;
+  height: 30vh;
+  animation: spin 1s linear infinite;
+  margin: 2vh auto 0;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 </style>

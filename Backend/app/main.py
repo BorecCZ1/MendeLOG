@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.database_queries import get_basic_articles, get_detailed_articles_with_sentiments
+from app.db.database_queries import get_detailed_articles_with_sentiments, get_single_detailed_article_with_sentiment
 from app.firebase.database_firestore import db_firestore
+from app.firebase.database_firestore_queries import add_suspicious_activity, get_all_suspicious_activities, \
+    delete_suspicious_activity
 from app.models.suspicious_activity import SuspiciousActivity
 
 app = FastAPI()
@@ -26,11 +28,8 @@ async def get_logs():
 
 @app.get("/logs/{article_id}")
 async def get_single_log(article_id: int):
-    rows = await get_detailed_articles_with_sentiments()
-    for article in rows:
-        if article["articles_id"] == article_id:
-            return {"article": article}
-    return {"article": None}
+    article = await get_single_detailed_article_with_sentiment(article_id)
+    return {"article": article}
 
 """
 SUSPICIOUS ACTIVITY ENDPOINTS
@@ -39,32 +38,25 @@ SUSPICIOUS ACTIVITY ENDPOINTS
 @app.get("/suspicious-activity")
 async def list_activities():
     try:
-        activities_ref = db_firestore.collection("suspicious_activity").stream()
-        activities = [
-            {**doc.to_dict(), "id": doc.id}
-            for doc in activities_ref
-        ]
-        return activities
+        return get_all_suspicious_activities()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/suspicious-activity")
 async def report_activity(activity: SuspiciousActivity):
     try:
-        doc_ref = db_firestore.collection("suspicious_activity").add(activity.dict())
-        return {"status": "ok", "id": doc_ref[1].id}
+        doc_id = add_suspicious_activity(activity)
+        return {"status": "ok", "id": doc_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/suspicious-activity/{doc_id}")
 async def delete_activity(doc_id: str):
     try:
-        db_firestore.collection("suspicious_activity").document(doc_id).delete()
+        delete_suspicious_activity(doc_id)
         return {"status": "deleted", "id": doc_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 """
 Day one bro

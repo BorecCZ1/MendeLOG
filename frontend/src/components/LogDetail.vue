@@ -2,32 +2,26 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Article } from "@/model/Article";
-import {useArticleService} from "@/services/articleService";
+import { useArticleService } from "@/services/articleService";
 
 const route = useRoute();
 const router = useRouter();
 const log = ref<Article | null>(null);
 
-const {
-  fetchLogs,
-  fetchSingleLog
-} = useArticleService();
+const { fetchSingleLog } = useArticleService();
 
 onMounted(async () => {
-  const logs = await fetchLogs();
-  const found = logs.find((l) => l.articles_id === Number(route.params.id));
-  if (found) {
-    log.value = found;
-  } else {
-    log.value = await fetchSingleLog(Number(route.params.id));
+  const id = Number(route.params.id);
+  if (!isNaN(id)) {
+    log.value = await fetchSingleLog(id);
   }
 });
-
 
 const goBack = () => {
   router.go(-1);
 };
 </script>
+
 
 <template>
   <div class="log-detail">
@@ -132,8 +126,7 @@ p {
   width: 50vh;
   height: 50vh;
   animation: spin 1s infinite linear;
-  margin: 0 auto;
-  margin-top: 2vh;
+  margin: 2vh auto 0;
 }
 
 @keyframes spin {

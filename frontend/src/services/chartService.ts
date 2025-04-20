@@ -4,11 +4,6 @@ import type { Article } from "@/model/Article";
 Chart.register(CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale, BarController);
 
 export const useChartService = () => {
-    const getColorForValue = (value: number) => {
-        if (value <= 15) return 'rgba(255, 99, 132, 0.8)';
-        if (value <= 25) return 'rgba(255, 206, 86, 0.8)';
-        return 'rgba(75, 192, 192, 0.8)';
-    };
 
     /*
     const generateHourlyChartData = (logs: Article[]) => {
@@ -40,28 +35,85 @@ export const useChartService = () => {
     */
 
 
+    // const generateHourlyChartData = (logs: Article[]) => {
+    //     const hoursMap = new Map<string, number>();
+    //     console.log("LOGY JAK CYP")
+    //     console.log(logs)
+    //
+    //     logs.forEach(log => {
+    //         const hour = new Date(log.retrieved_at).getHours().toString().padStart(2, '0') + ':00';
+    //         hoursMap.set(hour, (hoursMap.get(hour) || 0) + 1);
+    //     });
+    //
+    //     const sortedHours = Array.from(hoursMap.keys()).sort();
+    //     const values = sortedHours.map(hour => hoursMap.get(hour) || 0);
+    //
+    //     return {
+    //         labels: sortedHours,
+    //         datasets: [
+    //             {
+    //                 label: 'Počet reportů',
+    //                 data: values,
+    //                 backgroundColor: values.map(getColorForValue),
+    //                 borderColor: values.map(getColorForValue),
+    //                 borderWidth: 1
+    //             }
+    //         ]
+    //     };
+    // };
+
     const generateHourlyChartData = (logs: Article[]) => {
-        const hoursMap = new Map<string, number>();
-        console.log("LOGY JAK CYP")
-        console.log(logs)
+        type TimeLabel = string;
+
+        const timeMap = new Map<TimeLabel, number>();
 
         logs.forEach(log => {
-            const hour = new Date(log.retrieved_at).getHours().toString().padStart(2, '0') + ':00';
-            hoursMap.set(hour, (hoursMap.get(hour) || 0) + 1);
+            const date = new Date(log.retrieved_at);
+
+            const label = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}. ${date.getHours().toString().padStart(2, '0')}:00`;
+
+            timeMap.set(label, (timeMap.get(label) || 0) + 1);
         });
 
-        const sortedHours = Array.from(hoursMap.keys()).sort();
-        const values = sortedHours.map(hour => hoursMap.get(hour) || 0);
+        const sortedLabels = Array.from(timeMap.keys()).sort((a, b) => {
+            const parseLabel = (label: string) => {
+                const [datePart, hourPart] = label.split(' ');
+                const [day, month] = datePart.split('.').map(Number);
+                const hour = Number(hourPart.split(':')[0]);
+                return new Date(new Date().getFullYear(), month - 1, day, hour);
+            };
+
+            return parseLabel(a).getTime() - parseLabel(b).getTime();
+        });
+
+        const values = sortedLabels.map(label => timeMap.get(label) || 0);
+
+        const minValue = Math.min(...values);
+        const maxValue = Math.max(...values);
+
+        const getDynamicColor = (value: number): string => {
+            if (maxValue === minValue) {
+                return 'rgba(0, 255, 0, 0.8)';
+            }
+
+            const ratio = (value - minValue) / (maxValue - minValue);
+
+            const r = Math.round(255 * (1 - ratio));
+            const g = Math.round(255 * ratio);
+            const b = Math.round(50 * (1 - ratio));
+
+            return `rgba(${r}, ${g}, ${b}, 0.8)`;
+        };
 
         return {
-            labels: sortedHours,
+            labels: sortedLabels,
             datasets: [
                 {
                     label: 'Počet reportů',
                     data: values,
-                    backgroundColor: values.map(getColorForValue),
-                    borderColor: values.map(getColorForValue),
-                    borderWidth: 1
+                    backgroundColor: values.map(getDynamicColor),
+                    borderColor: 'rgba(0, 0, 0, 0.1)',
+                    borderWidth: 1,
                 }
             ]
         };
@@ -81,25 +133,32 @@ export const useChartService = () => {
                 responsive: true,
                 plugins: {
                     legend: { position: 'top' },
+                    title: {
+                        display: true,
+                        text: 'Počet reportů po hodinách podle dne'
+                    }
                 },
                 scales: {
                     x: {
+                        stacked: true,
                         title: {
                             display: true,
-                            text: 'Čas',
+                            text: 'Čas (hodiny)'
                         }
                     },
                     y: {
+                        stacked: true,
                         title: {
                             display: true,
-                            text: 'Počet reportů',
+                            text: 'Počet reportů'
                         },
-                        min: 0,
+                        beginAtZero: true
                     }
                 }
             }
         });
     };
+
 
     const filterTodayLogs = (logs: Article[]): Article[] => {
         const today = new Date();

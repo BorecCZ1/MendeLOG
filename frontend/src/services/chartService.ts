@@ -1,78 +1,32 @@
-import { Chart, CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale, BarController } from 'chart.js';
-import type { Article } from "@/model/Article";
+import {Chart, CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale, BarController} from 'chart.js';
+import type {Article} from "@/model/Article";
 
 Chart.register(CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale, BarController);
 
 export const useChartService = () => {
 
-    /*
-    const generateHourlyChartData = (logs: Article[]) => {
-        const todayLogs = filterTodayLogs(logs);
-
-        const hoursMap = new Map<string, number>();
-
-        todayLogs.forEach(log => {
-            const hour = new Date(log.retrieved_at).getHours().toString().padStart(2, '0') + ':00';
-            hoursMap.set(hour, (hoursMap.get(hour) || 0) + 1);
-        });
-
-        const sortedHours = Array.from(hoursMap.keys()).sort();
-        const values = sortedHours.map(hour => hoursMap.get(hour) || 0);
-
-        return {
-            labels: sortedHours,
-            datasets: [
-                {
-                    label: 'Počet reportů',
-                    data: values,
-                    backgroundColor: values.map(getColorForValue),
-                    borderColor: values.map(getColorForValue),
-                    borderWidth: 1
-                }
-            ]
-        };
-    };
-    */
-
-
-    // const generateHourlyChartData = (logs: Article[]) => {
-    //     const hoursMap = new Map<string, number>();
-    //     console.log("LOGY JAK CYP")
-    //     console.log(logs)
-    //
-    //     logs.forEach(log => {
-    //         const hour = new Date(log.retrieved_at).getHours().toString().padStart(2, '0') + ':00';
-    //         hoursMap.set(hour, (hoursMap.get(hour) || 0) + 1);
-    //     });
-    //
-    //     const sortedHours = Array.from(hoursMap.keys()).sort();
-    //     const values = sortedHours.map(hour => hoursMap.get(hour) || 0);
-    //
-    //     return {
-    //         labels: sortedHours,
-    //         datasets: [
-    //             {
-    //                 label: 'Počet reportů',
-    //                 data: values,
-    //                 backgroundColor: values.map(getColorForValue),
-    //                 borderColor: values.map(getColorForValue),
-    //                 borderWidth: 1
-    //             }
-    //         ]
-    //     };
-    // };
-
     const generateHourlyChartData = (logs: Article[]) => {
         type TimeLabel = string;
 
-        const timeMap = new Map<TimeLabel, number>();
+        const timeMap = new Map<TimeLabel, { processed: number; unprocessed: number }>();
 
         logs.forEach(log => {
             const date = new Date(log.retrieved_at);
-
             const label = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}. ${date.getHours().toString().padStart(2, '0')}:00`;
 
-            timeMap.set(label, (timeMap.get(label) || 0) + 1);
+            const isProcessed =
+                log.articles_sentiments_id != null &&
+                log.short_summary_id != null &&
+                log.long_summary_id != null;
+
+            const entry = timeMap.get(label) || { processed: 0, unprocessed: 0 };
+            if (isProcessed) {
+                entry.processed++;
+            } else {
+                entry.unprocessed++;
+            }
+
+            timeMap.set(label, entry);
         });
 
         const sortedLabels = Array.from(timeMap.keys()).sort((a, b) => {
@@ -86,10 +40,11 @@ export const useChartService = () => {
             return parseLabel(a).getTime() - parseLabel(b).getTime();
         });
 
-        const values = sortedLabels.map(label => timeMap.get(label) || 0);
+        const processedValues = sortedLabels.map(label => timeMap.get(label)?.processed || 0);
+        const unprocessedValues = sortedLabels.map(label => timeMap.get(label)?.unprocessed || 0);
 
-        const minValue = Math.min(...values);
-        const maxValue = Math.max(...values);
+        const minValue = Math.min(...processedValues);
+        const maxValue = Math.max(...processedValues);
 
         const getDynamicColor = (value: number): string => {
             if (maxValue === minValue) {
@@ -109,15 +64,22 @@ export const useChartService = () => {
             labels: sortedLabels,
             datasets: [
                 {
-                    label: 'Počet reportů',
-                    data: values,
-                    backgroundColor: values.map(getDynamicColor),
-                    borderColor: 'rgba(0, 0, 0, 0.1)',
-                    borderWidth: 1,
+                    label: 'Zpracované články',
+                    data: processedValues,
+                    backgroundColor: processedValues.map(getDynamicColor),
+                    stack: 'stack1',
+                },
+                {
+                    label: 'Nezpracované články',
+                    data: unprocessedValues,
+                    backgroundColor: 'rgba(100, 100, 100, 0.8)', // šedá pro nezpracované
+                    stack: 'stack1',
                 }
             ]
         };
     };
+
+
 
     const renderChart = (canvas: HTMLCanvasElement, logs: Article[], existingChart: Chart | null): Chart => {
         const data = generateHourlyChartData(logs);
@@ -132,10 +94,23 @@ export const useChartService = () => {
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { position: 'top' },
-                    title: {
-                        display: true,
-                        text: 'Počet reportů po hodinách podle dne'
+                    legend: { display: true },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const dataset = context.dataset;
+                                const value = context.raw as number;
+                                const dataIndex = context.dataIndex;
+
+                                const processed = context.chart.data.datasets[0].data[dataIndex] as number;
+                                const unprocessed = context.chart.data.datasets[1].data[dataIndex] as number;
+                                const total = processed + unprocessed;
+
+                                const percent = ((value / total) * 100).toFixed(1);
+
+                                return `${dataset.label}: ${value} (${percent}%)`;
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -150,12 +125,13 @@ export const useChartService = () => {
                         stacked: true,
                         title: {
                             display: true,
-                            text: 'Počet reportů'
+                            text: 'Počet článků'
                         },
                         beginAtZero: true
                     }
                 }
             }
+
         });
     };
 

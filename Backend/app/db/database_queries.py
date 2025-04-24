@@ -16,6 +16,7 @@ async def refresh_materialized_view_if_needed():
 
         if not exists:
             print("🆕 Materialized view neexistuje, vytvářím ji...")
+
             cursor.execute("""
                 CREATE MATERIALIZED VIEW detailed_articles_with_sentiments_mv AS
                 SELECT
@@ -27,12 +28,15 @@ async def refresh_materialized_view_if_needed():
                     a.domain,
                     a.url,
                     a.articles_categories_id,
+                    a.articles_sentiments_id,
+                    a.short_summary_id,
+                    a.long_summary_id,
                     s.statuses_id,
                     s.params ->> 'description' AS description,
                     st.description AS status_description
                 FROM articles a
-                INNER JOIN articles_sentiments s ON a.articles_id = s.articles_id
-                INNER JOIN statuses st ON s.statuses_id = st.statuses_id
+                LEFT JOIN articles_sentiments s ON a.articles_id = s.articles_id
+                LEFT JOIN statuses st ON s.statuses_id = st.statuses_id
                 ORDER BY a.retrieved_at DESC
                 LIMIT 2000;
             """)
@@ -53,7 +57,7 @@ async def refresh_materialized_view_if_needed():
                 should_refresh = True
             else:
                 age = datetime.now(timezone.utc) - latest_retrieved_at
-                should_refresh = age > timedelta(minutes=10000) #TODO změnit na požadovaný počet minut
+                should_refresh = age > timedelta(minutes=100000) #TODO změnit na požadovaný počet minut
 
             if should_refresh:
                 print("🔁 Obnovuju materialized view (starší než 5 minut)")
@@ -167,3 +171,6 @@ async def get_single_detailed_article_with_sentiment(article_id: int):
 #     except Exception as e:
 #         print("❌ Chyba při načítání článků se sentimenty:", e)
 #         return []
+
+
+# DROP MATERIALIZED VIEW detailed_articles_with_sentiments_mv;

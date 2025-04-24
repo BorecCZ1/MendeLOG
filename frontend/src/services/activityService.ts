@@ -1,6 +1,6 @@
-import { ref } from 'vue';
-import { SuspiciousActivity } from '@/model/SuspiciousActivity';
-import { useSuspiciousActivityService } from '@/services/suspiciousActivityService';
+import {ref} from 'vue';
+import {SuspiciousActivity} from '@/model/SuspiciousActivity';
+import {useSuspiciousActivityService} from '@/services/suspiciousActivityService';
 
 export function useActivities() {
     const activities = ref<SuspiciousActivity[]>([]);
@@ -20,7 +20,7 @@ export function useActivities() {
     };
 
     const toggleSolved = async (activity: SuspiciousActivity) => {
-        const updated = { ...activity, solved: !activity.solved };
+        const updated = {...activity, solved: !activity.solved};
         try {
             await useSuspiciousActivityService.create(updated);
             if (activity.id) {

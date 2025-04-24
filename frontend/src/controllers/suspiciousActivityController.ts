@@ -1,4 +1,4 @@
-import { useSuspiciousActivityService } from "@/services/suspiciousActivityService";
+import {useSuspiciousActivityService} from "@/services/suspiciousActivityService";
 import {SuspiciousActivity} from "../model/SuspiciousActivity";
 
 export const suspiciousActivityController = {

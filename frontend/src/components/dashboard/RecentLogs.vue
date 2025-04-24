@@ -37,7 +37,7 @@ h2 {
   border-radius: 50%;
   width: 30vh;
   height: 30vh;
-  animation: spin 1s normal infinite;
+  animation: spin 1s linear infinite;
   margin: 0 auto;
   margin-top: 2vh;
 }

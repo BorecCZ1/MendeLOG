@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink } from 'vue-router';
+import {RouterLink} from 'vue-router';
 </script>
 
 <template>
@@ -14,64 +14,67 @@ import { RouterLink } from 'vue-router';
 </template>
 
 <style scoped>
-/* Sidebar */
 .sidebar {
-  width: 250px;
+  width: 15%;
   height: 100vh;
-  background: linear-gradient(135deg, #2c3e50, #34495e);
+  background: linear-gradient(200deg, rgba(44, 62, 80, 0.89), rgba(26, 188, 156, 0.76));
   color: #ecf0f1;
-  padding: 20px;
+  padding: 2vh;
   position: fixed;
   top: 0;
   left: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 1vh 0 3vh rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease-in-out;
 }
 
 .title {
-  font-size: 2.2rem;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-size: 2.4rem;
+  font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 2rem;
   color: #ecf0f1;
   text-align: center;
   font-family: 'Roboto', sans-serif;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  transition: text-shadow 0.3s ease;
 }
 
 nav {
   display: flex;
   flex-direction: column;
-  margin-top: 1rem;
+  margin-top: 2rem;
   gap: 1.5rem;
 }
 
 .nav-item {
   display: block;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   text-decoration: none;
   color: #ecf0f1;
-  padding: 10px 15px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  padding: 1vh 2vh;
+  border-radius: 1vh;
+  transition: background-color 0.3s ease, transform 0.2s ease, padding 0.2s ease;
 }
 
 .nav-item:hover {
   background-color: #16a085;
   transform: scale(1.05);
+  padding-left: 3vh;
+  cursor: pointer;
 }
 
 .nav-item.router-link-exact-active {
   background-color: #1abc9c;
   font-weight: bold;
+  color: #34495e;
 }
 
-nav .nav-item:hover {
-  background-color: #16a085;
-  cursor: pointer;
+nav .nav-item:active {
+  background-color: #1abc9c;
+  transform: scale(0.98);
 }
 
 .sidebar::after {
@@ -79,8 +82,9 @@ nav .nav-item:hover {
   position: absolute;
   bottom: 2vh;
   width: 85%;
-  height: 2px;
+  height: 0.5vh;
   background-color: #ecf0f1;
   margin: 0 auto;
+  border-radius: 5vh;
 }
 </style>

@@ -1,46 +1,43 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
-import { useArticleService } from "@/services/articleService";
+import {ref, watch} from "vue";
 import ArticleComponent from "@/components/dashboard/ArticleComponent.vue";
-import NotFound from "@/components/NoArticlesFound.vue";
+import NoArticlesFound from "@/components/NoArticlesFound.vue";
 
-const isLoading = ref(true);
-
-const {
-  filteredLogs,
-  searchQuery,
-  startDate,
-  endDate,
-  selectedStatuses,
-  availableStatuses,
-  fetchAndFilterLogs,
-  resetFilters,
-} = useArticleService();
-
-onMounted(async () => {
-  isLoading.value = true;
-  await fetchAndFilterLogs();
-  isLoading.value = false;
+const props = defineProps({
+  logs: Array,
+  isLoading: Boolean,
+  searchQuery: String,
+  startDate: String,
+  endDate: String,
+  selectedStatuses: Array,
+  availableStatuses: Array
 });
+
+const emit = defineEmits([
+  'update:searchQuery',
+  'update:startDate',
+  'update:endDate',
+  'update:selectedStatuses',
+  'reset-filters'
+]);
+
+const showFiltersPanel = ref(false);
 
 const toggleFiltersPanel = () => {
   showFiltersPanel.value = !showFiltersPanel.value;
 };
 
-const showFiltersPanel = ref(false);
-
-watch(startDate, (newStart) => {
-  if (newStart && endDate.value && new Date(newStart) > new Date(endDate.value)) {
-    endDate.value = newStart;
+watch(() => props.startDate, (newStart) => {
+  if (newStart && props.endDate && new Date(newStart) > new Date(props.endDate)) {
+    emit('update:endDate', newStart);
   }
 });
 
-watch(endDate, (newEnd) => {
-  if (newEnd && startDate.value && new Date(newEnd) < new Date(startDate.value)) {
-    startDate.value = newEnd;
+watch(() => props.endDate, (newEnd) => {
+  if (newEnd && props.startDate && new Date(newEnd) < new Date(props.startDate)) {
+    emit('update:startDate', newEnd);
   }
 });
-
 </script>
 
 <template>
@@ -48,7 +45,8 @@ watch(endDate, (newEnd) => {
     <h2>Logs</h2>
 
     <input
-        v-model="searchQuery"
+        :value="searchQuery"
+        @input="emit('update:searchQuery', $event.target.value)"
         type="text"
         placeholder="Search logs..."
         class="search-bar"
@@ -56,14 +54,15 @@ watch(endDate, (newEnd) => {
 
     <div class="filters-actions">
       <button @click="toggleFiltersPanel" class="add-filters-button">Add Filters</button>
-      <button @click="resetFilters" class="reset-filters-button">Reset Filters</button>
+      <button @click="emit('reset-filters')" class="reset-filters-button">Reset Filters</button>
     </div>
 
     <div v-if="showFiltersPanel" class="filters-panel">
       <div class="date-filters">
         <label for="start-date" class="filter-label">Start Date:</label>
         <input
-            v-model="startDate"
+            :value="startDate"
+            @input="emit('update:startDate', $event.target.value)"
             type="date"
             id="start-date"
             class="date-picker"
@@ -72,12 +71,13 @@ watch(endDate, (newEnd) => {
 
         <label for="end-date" class="filter-label">End Date:</label>
         <input
-            v-model="endDate"
+            :value="endDate"
+            @input="emit('update:endDate', $event.target.value)"
             type="date"
             id="end-date"
             class="date-picker"
             :min="startDate || undefined"
-        />      </div>
+        /></div>
 
       <div class="status-filters">
         <br>
@@ -88,7 +88,13 @@ watch(endDate, (newEnd) => {
                 type="checkbox"
                 :id="'status-' + status.id"
                 :value="status.id"
-                v-model="selectedStatuses" />
+                :checked="selectedStatuses.includes(status.id)"
+                @change="(e) => {
+                  const newSelected = e.target.checked
+                    ? [...selectedStatuses, status.id]
+                    : selectedStatuses.filter(id => id !== status.id);
+                  emit('update:selectedStatuses', newSelected);
+                }"/>
             <label :for="'status-' + status.id">{{ status.description }}</label>
           </div>
         </div>
@@ -101,15 +107,16 @@ watch(endDate, (newEnd) => {
       <p class="loading-spinner"></p>
     </div>
 
-    <div v-else-if="filteredLogs.length === 0" class="no-articles-found">
-      <NotFound />
+    <div v-else-if="logs.length === 0" class="no-articles-found">
+      <NoArticlesFound/>
     </div>
 
     <div v-else class="log-list">
-      <ArticleComponent v-for="log in filteredLogs" :key="log.articles_id" :log="log" />
+      <ArticleComponent v-for="log in logs" :key="log.articles_id" :log="log"/>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .logs-panel {
@@ -118,6 +125,7 @@ watch(endDate, (newEnd) => {
   background: #1E1E1E;
   color: white;
   padding: 2vh;
+  border-radius: 1.5rem;
   display: flex;
   flex-direction: column;
 }
@@ -152,7 +160,7 @@ h2 {
   border-radius: 0.5rem;
   cursor: pointer;
   font-size: 1rem;
-  min-width: 120px;
+  min-width: 12vh;
 }
 
 .add-filters-button:hover, .reset-filters-button:hover {

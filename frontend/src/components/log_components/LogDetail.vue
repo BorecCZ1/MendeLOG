@@ -29,30 +29,52 @@ const goBack = () => {
 
     <template v-if="log">
       <div class="log-content">
+
         <div class="log-item">
           <strong>Title:</strong>
           <p>{{ log.article_title }}</p>
         </div>
+
         <div class="log-item">
           <strong>Retrieved at:</strong>
           <p>{{ new Date(log.retrieved_at).toLocaleString() }}</p>
         </div>
+
         <div class="log-item">
           <strong>Published at:</strong>
           <p>{{ new Date(log.published_at).toLocaleString() }}</p>
         </div>
+
+        <div class="log-item">
+          <strong>Articles sentiments ID:</strong>
+          <p>{{ log.articles_sentiments_id || 'No article sentiments id available' }}</p>
+        </div>
+
+        <div class="log-item">
+          <strong>Short summary ID:</strong>
+          <p>{{ log.short_summary_id || 'No short summary id available' }}</p>
+        </div>
+
+        <div class="log-item">
+          <strong>Long summary ID:</strong>
+          <p>{{ log.long_summary_id || 'No long summary id available' }}</p>
+        </div>
+
         <div class="log-item">
           <strong>Language:</strong>
           <p>{{ log.lang }}</p>
         </div>
+
         <div class="log-item">
           <strong>Domain:</strong>
           <p>{{ log.domain }}</p>
         </div>
+
         <div class="log-item">
           <strong>URL:</strong>
           <p><a :href="log.url" target="_blank">{{ log.url }}</a></p>
         </div>
+
         <div class="log-item">
           <strong>Status ID:</strong>
           <p>{{ log.statuses_id ?? 'N/A' }}</p>

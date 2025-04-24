@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
-import { SuspiciousActivity } from "@/model/SuspiciousActivity";
+import {onMounted, ref, computed} from "vue";
+import {SuspiciousActivity} from "@/model/SuspiciousActivity";
 import ActivityColumn from "@/components/suspicious_activity/ActivityColumn.vue";
 import ActivityForm from "@/components/suspicious_activity/ActivityForm.vue";
 import {useActivities} from "@/services/activityService";
 
-const { activities,
+const {
+  activities,
   isLoading,
   fetchActivities,
   toggleSolved,
@@ -47,7 +48,7 @@ const toggleExpanded = (id: string) => {
       <div v-if="showForm" class="modal-backdrop" @click.self="showForm = false">
         <div class="modal">
           <button class="modal-close" @click="showForm = false">×</button>
-          <ActivityForm @created="handleAddActivity" />
+          <ActivityForm @created="handleAddActivity"/>
         </div>
       </div>
     </transition>
@@ -92,6 +93,7 @@ const toggleExpanded = (id: string) => {
   justify-content: space-between;
   align-items: center;
 }
+
 .toggle-form {
   background-color: #3a5f3a;
   border: none;
@@ -101,7 +103,7 @@ const toggleExpanded = (id: string) => {
   font-size: 1rem;
   cursor: pointer;
   font-weight: bold;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   transition: background 0.3s ease;
 }
 
@@ -115,7 +117,7 @@ const toggleExpanded = (id: string) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -128,7 +130,7 @@ const toggleExpanded = (id: string) => {
   border-radius: 1rem;
   width: 90%;
   max-width: 600px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .modal-close {

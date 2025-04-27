@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, defineProps} from "vue";
+import {computed} from "vue";
 import { SuspiciousActivity } from "@/model/SuspiciousActivity";
 import ActivityCard from "@/components/suspicious_activity/ActivityCard.vue";
 import {useActivities} from "@/services/activityService";

@@ -3,19 +3,39 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Article } from "@/model/Article";
 import { useArticleService } from "@/services/articleService";
+import NotFound from "@/views/NotFound.vue";
 
 const route = useRoute();
 const router = useRouter();
 const log = ref<Article | null>(null);
+const hasError = ref(false);
+const isLoading = ref(true);
 
 const { fetchSingleLog } = useArticleService();
 
 onMounted(async () => {
   const id = Number(route.params.id);
-  if (!isNaN(id)) {
-    log.value = await fetchSingleLog(id);
+
+  if (isNaN(id)) {
+    hasError.value = true;
+    isLoading.value = false;
+    return;
+  }
+
+  try {
+    const result = await fetchSingleLog(id);
+    if (result) {
+      log.value = result;
+    } else {
+      hasError.value = true;
+    }
+  } catch (err) {
+    hasError.value = true;
+  } finally {
+    isLoading.value = false;
   }
 });
+
 
 const goBack = () => {
   router.go(-1);
@@ -27,9 +47,16 @@ const goBack = () => {
   <div class="log-detail">
     <button @click="goBack" class="back-button">Back</button>
 
-    <template v-if="log">
-      <div class="log-content">
+    <template v-if="isLoading">
+      <p class="loading-spinner"></p>
+    </template>
 
+    <template v-else-if="hasError">
+      <NotFound/>
+    </template>
+
+    <template v-else-if="log">
+      <div class="log-content">
         <div class="log-item">
           <strong>Title:</strong>
           <p>{{ log.article_title }}</p>
@@ -90,15 +117,20 @@ const goBack = () => {
           <p>{{ log.description || 'No description available' }}</p>
         </div>
 
+        <div class="log-item">
+          <strong>Tools ID:</strong>
+          <p>{{ log.tools_id || 'No tools ID available' }}</p>
+        </div>
       </div>
     </template>
-
-    <p v-else class="loading-spinner"></p>
   </div>
 </template>
 
+
 <style scoped>
 .log-detail {
+  width: 100%;
+  height: 100%;
   padding: 2rem;
   max-width: 100%;
   margin: auto;

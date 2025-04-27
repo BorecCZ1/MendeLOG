@@ -166,7 +166,8 @@ export const useArticleService = () => {
     const badStatusCountLastTwoDays = computed(() => {
         const now = new Date();
         const twoDaysAgo = new Date(now);
-        twoDaysAgo.setDate(now.getDate() - 1);
+        twoDaysAgo.setDate(now.getDate() - 2);
+        twoDaysAgo.setHours(0, 0, 0, 0);
 
         return badStatuses.value.filter((log) => {
             const retrievedDate = new Date(log.retrieved_at);

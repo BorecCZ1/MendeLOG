@@ -33,10 +33,12 @@ async def refresh_materialized_view_if_needed():
                     a.long_summary_id,
                     s.statuses_id,
                     s.params ->> 'description' AS description,
-                    st.description AS status_description
+                    st.description AS status_description,
+                    s.tools_id
                 FROM articles a
                 LEFT JOIN articles_sentiments s ON a.articles_id = s.articles_id
                 LEFT JOIN statuses st ON s.statuses_id = st.statuses_id
+                WHERE s.tools_id = 17
                 ORDER BY a.retrieved_at DESC
                 LIMIT 2000;
             """)
@@ -73,7 +75,7 @@ async def refresh_materialized_view_if_needed():
         print("❌ Chyba při kontrole/obnovení materialized view:", e)
 
 
-async def get_detailed_articles_with_sentiments(limit: int = 50):
+async def get_detailed_articles_with_sentiments():
     try:
         await refresh_materialized_view_if_needed()
 

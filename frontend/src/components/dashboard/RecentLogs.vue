@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
 import { Article } from "@/model/Article";
 import ArticleComponent from "@/components/dashboard/ArticleComponent.vue";
 

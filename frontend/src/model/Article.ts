@@ -13,4 +13,5 @@ export interface Article {
     statuses_id?: number;
     description?: string;
     status_description?: string;
+    tools_id?: number;
 }

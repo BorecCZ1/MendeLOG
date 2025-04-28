@@ -12,6 +12,7 @@ export interface Article {
     long_summary_id?: number;
     statuses_id?: number;
     description?: string;
+    processed_by?: string;
     status_description?: string;
     tools_id?: number;
 }

@@ -42,6 +42,10 @@ const toggleExpanded = (id: string) => {
         + Add Suspicious Activity
       </button>
 
+      <button class="toggle-form" @click="">
+        ▶ Run Script
+      </button>
+
     </div>
 
     <transition name="fade">

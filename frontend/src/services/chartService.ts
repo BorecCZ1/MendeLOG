@@ -72,7 +72,7 @@ export const useChartService = () => {
                 {
                     label: 'Nezpracované články',
                     data: unprocessedValues,
-                    backgroundColor: 'rgba(100, 100, 100, 0.8)', // šedá pro nezpracované
+                    backgroundColor: 'rgba(101, 101, 101, 0.9)',
                     stack: 'stack1',
                 }
             ]
@@ -135,22 +135,32 @@ export const useChartService = () => {
         });
     };
 
+    const filterLogsByServer = (logs: Article[], selectedServer: string) => {
+        if (selectedServer === 'all') {
+            return logs;
+        }
 
-    const filterTodayLogs = (logs: Article[]): Article[] => {
-        const today = new Date();
         return logs.filter(log => {
-            const date = new Date(log.retrieved_at);
-            return (
-                date.getFullYear() === today.getFullYear() &&
-                date.getMonth() === today.getMonth() &&
-                date.getDate() === today.getDate()
-            );
+            if (!log.processed_by) return false;
+            const lowerProcessed = log.processed_by.toLowerCase();
+            if (selectedServer === 'dita') {
+                return lowerProcessed.startsWith('dita');
+            }
+            if (selectedServer === 'afrodita') {
+                return lowerProcessed.startsWith('aphrodita');
+            }
+            return false;
         });
     };
 
+    const getFilteredLogsCount = (filteredLogs: Article[]) => {
+        return filteredLogs.length;
+    };
 
     return {
         renderChart,
         generateHourlyChartData,
+        filterLogsByServer,
+        getFilteredLogsCount
     };
 };

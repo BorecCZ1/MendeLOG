@@ -12,6 +12,7 @@ import Sidebar from './components/navigation/Sidebar.vue';
 </template>
 
 <style scoped>
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -20,7 +21,7 @@ import Sidebar from './components/navigation/Sidebar.vue';
 
 .content {
   flex-grow: 1;
-  padding: 20px;
+  padding: 2vh;
   overflow-x: hidden;
 }
 

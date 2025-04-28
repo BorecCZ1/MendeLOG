@@ -1,38 +1,20 @@
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
 import type { Article } from "@/model/Article";
+import { useStatusCheckerService } from "@/services/statusCheckerService";
 
 const props = defineProps<{
   logs: Article[];
   title: string;
 }>();
 
-const lastRetrieved = computed(() => {
-  if (!props.logs.length) return null;
-  return new Date(props.logs[0].retrieved_at);
-});
+const logs = computed(() => props.logs);
 
-const status = computed(() => {
-  if (!lastRetrieved.value) {
-    return { color: "#808080", text: "No data", icon: "ℹ️", border: "2px solid #808080" };
-  }
-
-  const now = new Date();
-  const diffMinutes = Math.floor((now.getTime() - lastRetrieved.value.getTime()) / 60000);
-
-  if (diffMinutes <= 10) {
-    return { color: "#28a745", text: "All systems operational", icon: "✅", border: "2px solid #28a745", time: diffMinutes };
-  }
-  if (diffMinutes <= 20) {
-    return { color: "#ffc107", text: "Minor delays", icon: "⚠️", border: "2px solid #ffc107", time: diffMinutes };
-  }
-  return { color: "#dc3545", text: "Critical issue", icon: "❌", border: "2px solid #dc3545", time: diffMinutes };
-});
+const { status } = useStatusCheckerService(logs, props.title);
 </script>
 
 <template>
   <div class="status-container">
-
     <h2>{{ props.title }}</h2>
 
     <div class="status-box" :style="{ border: status.border }">
@@ -46,14 +28,15 @@ const status = computed(() => {
   </div>
 </template>
 
+
 <style scoped>
 .status-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 45vh;
-  height: 45vh;
+  width: 70%;
+  height: 95%;
   background: #2a2a2a;
   border-radius: 1vh;
   padding: 2vh;

@@ -113,14 +113,20 @@ const goBack = () => {
         </div>
 
         <div class="log-item">
+          <strong>Tools ID:</strong>
+          <p>{{ log.tools_id || 'No tools ID available' }}</p>
+        </div>
+
+        <div class="log-item">
+          <strong>Processed by:</strong>
+          <p>{{ log.processed_by || 'N/A' }}</p>
+        </div>
+
+        <div class="log-item">
           <strong>Description:</strong>
           <p>{{ log.description || 'No description available' }}</p>
         </div>
 
-        <div class="log-item">
-          <strong>Tools ID:</strong>
-          <p>{{ log.tools_id || 'No tools ID available' }}</p>
-        </div>
       </div>
     </template>
   </div>

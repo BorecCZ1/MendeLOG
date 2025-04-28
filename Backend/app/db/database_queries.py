@@ -33,6 +33,7 @@ async def refresh_materialized_view_if_needed():
                     a.long_summary_id,
                     s.statuses_id,
                     s.params ->> 'description' AS description,
+                    s.params ->> 'processed_by' AS processed_by,
                     st.description AS status_description,
                     s.tools_id
                 FROM articles a

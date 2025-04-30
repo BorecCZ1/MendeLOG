@@ -1,16 +1,31 @@
-import {ref} from 'vue';
-import {SuspiciousActivity} from '@/model/SuspiciousActivity';
-import {useSuspiciousActivityService} from '@/services/suspiciousActivityService';
+import { ref } from 'vue';
+import api from './api';
+import { SuspiciousActivity } from '@/model/SuspiciousActivity';
 
 export function useActivities() {
     const activities = ref<SuspiciousActivity[]>([]);
     const isLoading = ref(true);
     const initialLoad = ref(true);
 
+    const getAllActivities = async (): Promise<SuspiciousActivity[]> => {
+        const res = await api.get("/suspicious-activity");
+        return res.data;
+    };
+
+    const createActivity = async (activity: SuspiciousActivity): Promise<{ id: string }> => {
+        const res = await api.post("/suspicious-activity", activity);
+        return res.data;
+    };
+
+    const deleteActivityById = async (id: string): Promise<{ status: string; id: string }> => {
+        const res = await api.delete(`/suspicious-activity/${id}`);
+        return res.data;
+    };
+
     const fetchActivities = async () => {
         try {
             if (initialLoad.value) isLoading.value = true;
-            activities.value = await useSuspiciousActivityService.getAll();
+            activities.value = await getAllActivities();
         } catch (error) {
             console.error("Chyba při načítání aktivit:", error);
         } finally {
@@ -20,11 +35,11 @@ export function useActivities() {
     };
 
     const toggleSolved = async (activity: SuspiciousActivity) => {
-        const updated = {...activity, solved: !activity.solved};
+        const updated = { ...activity, solved: !activity.solved };
         try {
-            await useSuspiciousActivityService.create(updated);
+            await createActivity(updated);
             if (activity.id) {
-                await useSuspiciousActivityService.delete(activity.id);
+                await deleteActivityById(activity.id);
             }
             await fetchActivities();
         } catch (error) {
@@ -34,7 +49,7 @@ export function useActivities() {
 
     const deleteActivity = async (id: string) => {
         try {
-            await useSuspiciousActivityService.delete(id);
+            await deleteActivityById(id);
             await fetchActivities();
         } catch (error) {
             console.error("Chyba při mazání aktivity:", error);
@@ -43,13 +58,18 @@ export function useActivities() {
 
     const addActivity = async (activity: SuspiciousActivity): Promise<boolean> => {
         try {
-            await useSuspiciousActivityService.create(activity);
+            await createActivity(activity);
             await fetchActivities();
             return true;
         } catch (error) {
             console.error("Chyba při přidávání aktivity:", error);
             return false;
         }
+    };
+
+    const evaluateFeed = async (): Promise<{ status: string; message: string }> => {
+        const res = await api.post("/suspicious-activity/evaluate-feed");
+        return res.data;
     };
 
     return {
@@ -60,5 +80,6 @@ export function useActivities() {
         toggleSolved,
         deleteActivity,
         addActivity,
+        evaluateFeed,
     };
 }

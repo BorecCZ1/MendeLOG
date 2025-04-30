@@ -14,6 +14,20 @@ const props = defineProps<{
   isLoading: boolean;
 }>();
 
+const handleMarkAll = () => {
+  props.activities.forEach(activity => {
+    if (activity.solved !== !activity.solved) {
+      props.onToggleSolved(activity);
+    }
+  });
+};
+
+const handleDeleteAll = () => {
+  props.activities.forEach(activity => {
+    props.onDelete(activity.id!);
+  });
+};
+
 const {
   initialLoad
 } = useActivities()
@@ -29,12 +43,23 @@ const sortedActivities = computed(() => {
     <div class="column-title">
       <h2>{{ title }}</h2>
     </div>
+
+    <div class="column-actions">
+      <button @click="handleMarkAll" class="action-btn">
+        {{ title=="✅ Solved" ? "Označit vše jako nevyřešené" : "Označit vše jako vyřešené" }}
+      </button>
+      <button @click="handleDeleteAll" class="action-btn delete">
+        Smazat vše
+      </button>
+    </div>
+
+
     <div class="scrollable">
       <p v-if="isLoading && initialLoad" class="loading-spinner"></p>
 
       <div v-else-if="sortedActivities.length === 0" class="empty-state">
         <p>
-          V tuto chvíli nejsou žádné podezřelé aktivity.<br />
+          V tuto chvíli nejsou žádné podezřelé aktivity.<br/>
           Všechno vypadá v pořádku.
         </p>
       </div>
@@ -128,5 +153,35 @@ const sortedActivities = computed(() => {
     transform: rotate(360deg);
   }
 }
+
+.column-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  background-color: #3a3a3a;
+  color: white;
+  border: none;
+  padding: 0.5em 1em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: #555;
+}
+
+.action-btn.delete {
+  background-color: #752f2f;
+}
+
+.action-btn.delete:hover {
+  background-color: #9b3a3a;
+}
+
 
 </style>

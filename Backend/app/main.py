@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.database_queries import get_detailed_articles_with_sentiments, get_single_detailed_article_with_sentiment
 from app.firebase.database_firestore import db_firestore
-from app.firebase.database_firestore_queries import add_suspicious_activity, get_all_suspicious_activities, \
-    delete_suspicious_activity
+from app.firebase.database_firestore_queries import add_suspicious_activity, get_all_suspicious_activities, delete_suspicious_activity, delete_suspicious_activities_by_solved, update_solved_status_for_all
 from app.models.suspicious_activity import SuspiciousActivity
+from app.script.log_evaluator import evaluate
 
 app = FastAPI()
 
@@ -57,6 +57,32 @@ async def delete_activity(doc_id: str):
         return {"status": "deleted", "id": doc_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/suspicious-activity/mark")
+async def mark_solved_status(current_status: bool, new_status: bool):
+    try:
+        update_solved_status_for_all(current_status, new_status)
+        return {"status": "updated", "from": current_status, "to": new_status}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/suspicious-activity/solved/{status}")
+async def delete_activities_by_solved(status: bool):
+    try:
+        delete_suspicious_activities_by_solved(status)
+        return {"status": "deleted_all", "solved": status}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/suspicious-activity/evaluate-feed")
+async def evaluate_feed():
+    try:
+        result = await evaluate()
+        return {"status": "ok", "message": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 """
 Day one bro

@@ -49,7 +49,7 @@ async def refresh_materialized_view_if_needed():
                 ON detailed_articles_with_sentiments_mv (articles_id, statuses_id);
             """)
 
-            print("✅ View vytvořena.")
+            print("✅ View vytvořeno.")
         else:
             cursor.execute("""
                 SELECT MAX(retrieved_at) FROM detailed_articles_with_sentiments_mv;
@@ -63,10 +63,10 @@ async def refresh_materialized_view_if_needed():
                 should_refresh = age > timedelta(minutes=100000) #TODO změnit na požadovaný počet minut
 
             if should_refresh:
-                print("🔁 Obnovuju materialized view (starší než 5 minut)")
+                print("🔁 Obnovuju materialized view")
                 cursor.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY detailed_articles_with_sentiments_mv;")
             else:
-                print("✅ Materialized view je čerstvý")
+                print("✅ Materialized view je aktuální")
 
         db.connection.commit()
         cursor.close()

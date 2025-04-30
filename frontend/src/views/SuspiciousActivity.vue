@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref, computed} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {SuspiciousActivity} from "@/model/SuspiciousActivity";
 import ActivityColumn from "@/components/suspicious_activity/ActivityColumn.vue";
 import ActivityForm from "@/components/suspicious_activity/ActivityForm.vue";
@@ -11,8 +11,10 @@ const {
   fetchActivities,
   toggleSolved,
   deleteActivity,
-  addActivity
+  addActivity,
+  evaluateFeed
 } = useActivities();
+
 
 const showForm = ref(false);
 const expanded = ref<string | null>(null);
@@ -23,6 +25,27 @@ const handleAddActivity = async (activity: SuspiciousActivity) => {
     showForm.value = false;
   }
 };
+
+const evaluating = ref(false);
+const evaluateStatus = ref<null | { status: string; message: string }>(null);
+
+const runEvaluation = async () => {
+  evaluating.value = true;
+  evaluateStatus.value = null;
+  try {
+    evaluateStatus.value = await evaluateFeed();
+    await fetchActivities()
+  } catch (error: any) {
+    console.error("Chyba při vyhodnocení feedu:", error);
+    evaluateStatus.value = {
+      status: "error",
+      message: error?.response?.data?.detail || "Nastala chyba při volání backendu.",
+    };
+  } finally {
+    evaluating.value = false;
+  }
+};
+
 
 onMounted(fetchActivities);
 
@@ -42,9 +65,14 @@ const toggleExpanded = (id: string) => {
         + Add Suspicious Activity
       </button>
 
-      <button class="toggle-form" @click="">
-        ▶ Run Script
+      <button class="toggle-form" @click="runEvaluation" :disabled="evaluating">
+        ▶ {{ evaluating ? "Running..." : "Run Script" }}
       </button>
+
+      <div v-if="evaluateStatus" :style="{ marginTop: '1rem', fontWeight: 'bold', color: evaluateStatus.status === 'ok' ? '#4caf50' : '#f44336' }">
+        {{ evaluateStatus.message }}
+      </div>
+
 
     </div>
 

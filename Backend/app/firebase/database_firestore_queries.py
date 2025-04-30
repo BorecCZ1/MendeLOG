@@ -17,3 +17,13 @@ def add_suspicious_activity(activity: SuspiciousActivity):
 
 def delete_suspicious_activity(doc_id: str):
     db_firestore.collection("suspicious_activity").document(doc_id).delete()
+
+def update_solved_status_for_all(current_status: bool, new_status: bool):
+    docs = db_firestore.collection("suspicious_activity").where("solved", "==", current_status).stream()
+    for doc in docs:
+        db_firestore.collection("suspicious_activity").document(doc.id).update({"solved": new_status})
+
+def delete_suspicious_activities_by_solved(solved: bool):
+    activities_ref = db_firestore.collection("suspicious_activity").where("solved", "==", solved).stream()
+    for doc in activities_ref:
+        db_firestore.collection("suspicious_activity").document(doc.id).delete()

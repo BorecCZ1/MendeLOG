@@ -7,6 +7,9 @@ export function useActivities() {
     const isLoading = ref(true);
     const initialLoad = ref(true);
 
+    const evaluating = ref(false);
+    const evaluateStatus = ref<null | { status: string; message: string }>(null);
+
     const getAllActivities = async (): Promise<SuspiciousActivity[]> => {
         const res = await api.get("/suspicious-activity");
         return res.data;
@@ -72,14 +75,38 @@ export function useActivities() {
         return res.data;
     };
 
+    const runEvaluation = async () => {
+        evaluating.value = true;
+        evaluateStatus.value = null;
+        try {
+            evaluateStatus.value = await evaluateFeed();
+            await fetchActivities();
+        } catch (error: any) {
+            console.error("Chyba při vyhodnocení feedu:", error);
+            evaluateStatus.value = {
+                status: "error",
+                message: error?.response?.data?.detail || "Nastala chyba při volání backendu.",
+            };
+        } finally {
+            evaluating.value = false;
+
+            setTimeout(() => {
+                evaluateStatus.value = null;
+            }, 5000);
+        }
+    };
+
     return {
         activities,
         isLoading,
         initialLoad,
+        evaluateStatus,
+        evaluating,
         fetchActivities,
         toggleSolved,
         deleteActivity,
         addActivity,
         evaluateFeed,
+        runEvaluation
     };
 }

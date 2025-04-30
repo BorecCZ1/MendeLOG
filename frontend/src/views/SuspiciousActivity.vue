@@ -8,12 +8,15 @@ import {useActivities} from "@/services/activityService";
 const {
   activities,
   isLoading,
+  evaluateStatus,
+  evaluating,
   fetchActivities,
   toggleSolved,
   deleteActivity,
   addActivity,
-  evaluateFeed
+  runEvaluation,
 } = useActivities();
+
 
 
 const showForm = ref(false);
@@ -25,27 +28,6 @@ const handleAddActivity = async (activity: SuspiciousActivity) => {
     showForm.value = false;
   }
 };
-
-const evaluating = ref(false);
-const evaluateStatus = ref<null | { status: string; message: string }>(null);
-
-const runEvaluation = async () => {
-  evaluating.value = true;
-  evaluateStatus.value = null;
-  try {
-    evaluateStatus.value = await evaluateFeed();
-    await fetchActivities()
-  } catch (error: any) {
-    console.error("Chyba při vyhodnocení feedu:", error);
-    evaluateStatus.value = {
-      status: "error",
-      message: error?.response?.data?.detail || "Nastala chyba při volání backendu.",
-    };
-  } finally {
-    evaluating.value = false;
-  }
-};
-
 
 onMounted(fetchActivities);
 
@@ -60,6 +42,7 @@ const toggleExpanded = (id: string) => {
 
 <template>
   <div class="suspicious_container">
+
     <div class="header">
       <button class="toggle-form" @click="showForm = !showForm">
         + Add Suspicious Activity
@@ -68,13 +51,18 @@ const toggleExpanded = (id: string) => {
       <button class="toggle-form" @click="runEvaluation" :disabled="evaluating">
         ▶ {{ evaluating ? "Running..." : "Run Script" }}
       </button>
-
-      <div v-if="evaluateStatus" :style="{ marginTop: '1rem', fontWeight: 'bold', color: evaluateStatus.status === 'ok' ? '#4caf50' : '#f44336' }">
-        {{ evaluateStatus.message }}
-      </div>
-
-
     </div>
+
+    <transition name="fade">
+      <div
+          v-if="evaluateStatus"
+          class="eval-status"
+          :class="evaluateStatus.status"
+      >
+        {{ evaluateStatus.message || (evaluateStatus.status === 'ok' ? 'Vyhodnocení proběhlo úspěšně.' : '') }}
+      </div>
+    </transition>
+
 
     <transition name="fade">
       <div v-if="showForm" class="modal-backdrop" @click.self="showForm = false">
@@ -194,5 +182,29 @@ const toggleExpanded = (id: string) => {
   flex: 1;
   min-width: 0;
 }
+
+.eval-status {
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+  align-self: flex-start;
+  transition: all 0.3s ease;
+  max-width: fit-content;
+}
+
+.eval-status.ok {
+  background-color: #e6f4ea;
+  color: #256029;
+  border: 1px solid #c5e1c5;
+}
+
+.eval-status.error {
+  background-color: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5c6c6;
+}
+
 
 </style>

@@ -61,7 +61,6 @@ canvas {
   flex-direction: column;
 }
 
-
 .filter {
   position: absolute;
   top: 1vh;
@@ -102,11 +101,9 @@ canvas {
   position: relative;
 }
 
-
 .log-count {
   text-align: center;
   font-size: 1.1rem;
-  color: #eee;
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
   padding: 1vh;

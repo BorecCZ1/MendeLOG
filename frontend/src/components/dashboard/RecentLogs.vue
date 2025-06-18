@@ -1,25 +1,34 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { Article } from "@/model/Article";
 import ArticleComponent from "@/components/dashboard/ArticleComponent.vue";
+import NoBadArticlesFound from "@/components/NoBadArticlesFound.vue";
 
-const props = defineProps<{ logs: Article[] }>();
+const props = defineProps<{
+  logs: Article[];
+  isLoading: boolean;
+}>();
+
+const badLogs = computed(() => {
+  return props.logs.filter(log => log.statuses_id !== 1);
+});
 </script>
 
 <template>
   <div class="recent-logs">
-    <div v-if="props.logs.length">
-      <ArticleComponent v-for="log in props.logs.slice(0, 4)" :key="log.articles_id" :log="log" />
+    <div v-if="badLogs.length">
+      <ArticleComponent
+          v-for="log in badLogs.slice(0, 4)"
+          :key="log.articles_id"
+          :log="log"
+      />
     </div>
-    <p v-else class="loading-spinner"></p>
+    <p v-else-if="props.isLoading" class="loading-spinner"></p>
+    <NoBadArticlesFound v-else />
   </div>
 </template>
 
 <style scoped>
-
-h2 {
-  font-weight: 400;
-}
-
 .recent-logs {
   width: 90%;
   border-radius: 1vh;
@@ -36,8 +45,7 @@ h2 {
   width: 30vh;
   height: 30vh;
   animation: spin 1s linear infinite;
-  margin: 0 auto;
-  margin-top: 2vh;
+  margin: 2vh auto 0;
 }
 
 @keyframes spin {
@@ -48,5 +56,4 @@ h2 {
     transform: rotate(360deg);
   }
 }
-
 </style>

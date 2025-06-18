@@ -17,8 +17,8 @@ import Sidebar from './components/navigation/Sidebar.vue';
   display: flex;
   height: 100vh;
   width: 100vw;
-  padding-left: 15vw; /* stejná šířka jako sidebar */
-  box-sizing: border-box; /* zajistí, že padding nebude přidávat k celkové šířce */
+  padding-left: 15vw;
+  box-sizing: border-box;
 }
 
 .content {

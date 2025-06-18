@@ -45,6 +45,5 @@ const showTitle = route.path !== '/';
 .log-title {
   font-size: 1rem;
   font-weight: 350;
-  color: white;
 }
 </style>

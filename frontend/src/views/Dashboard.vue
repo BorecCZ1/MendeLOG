@@ -11,9 +11,12 @@ const {
 } = useArticleService();
 
 const logs = ref<Article[]>([]);
+const isLoading = ref(true);
 
 onMounted(async () => {
+  isLoading.value = true;
   logs.value = await fetchLogs();
+  isLoading.value = false;
 });
 </script>
 
@@ -27,7 +30,7 @@ onMounted(async () => {
       </div>
 
       <div class="logs">
-        <RecentLogs :logs="logs"/>
+        <RecentLogs :logs="logs" :isLoading="isLoading" />
       </div>
 
     </div>

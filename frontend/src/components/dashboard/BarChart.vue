@@ -40,7 +40,6 @@ watch(() => filteredLogs.value, render, { deep: true });
       <canvas ref="chartRef"></canvas>
     </div>
 
-    <!-- Počet logů pod grafem -->
     <div class="log-count">
       <p>Total Logs: {{ totalLogsCount }}</p>
     </div>
@@ -48,11 +47,20 @@ watch(() => filteredLogs.value, render, { deep: true });
 </template>
 
 <style scoped>
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .chart-wrapper {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: 85%;
+  height: 85%;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .filter {
   position: absolute;
@@ -89,9 +97,11 @@ watch(() => filteredLogs.value, render, { deep: true });
 }
 
 .chart-container {
+  flex: 1;
   width: 100%;
-  height: 100%;
+  position: relative;
 }
+
 
 .log-count {
   text-align: center;
@@ -99,6 +109,7 @@ watch(() => filteredLogs.value, render, { deep: true });
   color: #eee;
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  margin-top: 2vh;
+  padding: 1vh;
 }
+
 </style>

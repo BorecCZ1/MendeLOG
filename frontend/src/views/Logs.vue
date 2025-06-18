@@ -54,15 +54,22 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+
 .my_content {
   display: flex;
-  width: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: start;
+  width: 80vw;
   height: 100%;
   padding: 1vh;
-  gap: 1em;
+  gap: 4em;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 LogList, Statistics {
   flex: 1;
 }
+
 </style>

@@ -83,21 +83,29 @@ watch(() => props.endDate, (newEnd) => {
         <br>
         <h4 class="filter-label">Select Statuses</h4>
         <div class="status-checkboxes">
-          <div v-for="status in availableStatuses" :key="status.id">
+          <label
+              v-for="status in availableStatuses"
+              :key="status.id"
+              :for="'status-' + status.id"
+              class="status-chip"
+              :class="{ selected: selectedStatuses.includes(status.id) }"
+          >
             <input
                 type="checkbox"
                 :id="'status-' + status.id"
                 :value="status.id"
                 :checked="selectedStatuses.includes(status.id)"
                 @change="(e) => {
-                  const newSelected = e.target.checked
-                    ? [...selectedStatuses, status.id]
-                    : selectedStatuses.filter(id => id !== status.id);
-                  emit('update:selectedStatuses', newSelected);
-                }"/>
-            <label :for="'status-' + status.id">{{ status.description }}</label>
-          </div>
+        const newSelected = e.target.checked
+          ? [...selectedStatuses, status.id]
+          : selectedStatuses.filter(id => id !== status.id);
+        emit('update:selectedStatuses', newSelected);
+      }"
+            />
+            {{ status.description }}
+          </label>
         </div>
+
       </div>
 
       <button @click="toggleFiltersPanel" class="close-filters-button">Close</button>
@@ -117,10 +125,9 @@ watch(() => props.endDate, (newEnd) => {
   </div>
 </template>
 
-
 <style scoped>
 .logs-panel {
-  width: 69%;
+  width: 60%;
   height: 100%;
   background: #1E1E1E;
   color: white;
@@ -201,11 +208,35 @@ h2 {
 .status-checkboxes {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
-.status-checkboxes input {
-  margin-right: 0.5rem;
+.status-chip input[type="checkbox"] {
+  display: none;
+}
+
+.status-chip {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  background-color: #555;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 0.95rem;
+  user-select: none;
+  border: 2px solid transparent;
+}
+
+.status-chip:hover {
+  background-color: #666;
+  transform: scale(1.05);
+}
+
+.status-chip.selected {
+  background-color: #4caf50;
+  color: #fff;
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 2px #2e7d32;
 }
 
 .close-filters-button {

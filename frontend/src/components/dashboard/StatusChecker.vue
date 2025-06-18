@@ -22,25 +22,28 @@ const { status } = useStatusCheckerService(logs, props.title);
       <p class="status-text">{{ status.text }}</p>
     </div>
 
-    <p v-if="status.time !== undefined" class="time-text">
-      Last record processed: {{ status.time }} min ago
+    <p v-if="status.time" class="time-text">
+      Last record processed: {{ status.time }}
     </p>
+
+
   </div>
 </template>
 
-
 <style scoped>
+
 .status-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 70%;
   height: 95%;
+  width: 70%;
   background: #2a2a2a;
   border-radius: 1vh;
   padding: 2vh;
   text-align: center;
+  overflow: hidden;
 }
 
 h2 {
@@ -54,10 +57,11 @@ h2 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 90%;
-  padding: 4vh;
+  width: 100%;
+  padding: 4vh 2vh;
   border-radius: 1vh;
   background: #1e1e1e;
+  margin-bottom: 2vh;
 }
 
 .status-icon {
@@ -71,8 +75,8 @@ h2 {
 }
 
 .time-text {
-  margin-top: 2vh;
   font-size: 1.1rem;
   color: white;
 }
+
 </style>

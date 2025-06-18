@@ -25,16 +25,31 @@ export function useStatusCheckerService(logs: ComputedRef<Article[]>, serverName
         }
 
         const now = new Date();
-        const diffMinutes = Math.floor((now.getTime() - lastRetrieved.value.getTime()) / 60000);
+        const diffMs = now.getTime() - lastRetrieved.value.getTime();
+        const diffMinutes = Math.floor(diffMs / 60000);
+
+        let timeText: string;
+
+        if (diffMinutes < 60) {
+            timeText = `${diffMinutes} min ago`;
+        } else if (diffMinutes < 2880) { // 48 * 60
+            const hours = Math.floor(diffMinutes / 60);
+            timeText = `${hours} hr${hours === 1 ? '' : 's'} ago`;
+        } else {
+            const days = Math.floor(diffMinutes / 1440); // 60 * 24
+            timeText = `${days} day${days === 1 ? '' : 's'} ago`;
+        }
 
         if (diffMinutes <= 10) {
-            return { color: "#28a745", text: "All systems operational", icon: "✅", border: "2px solid #28a745", time: diffMinutes };
+            return { color: "#28a745", text: "All systems operational", icon: "✅", border: "2px solid #28a745", time: timeText };
         }
         if (diffMinutes <= 20) {
-            return { color: "#ffc107", text: "Minor delays", icon: "⚠️", border: "2px solid #ffc107", time: diffMinutes };
+            return { color: "#ffc107", text: "Minor delays", icon: "⚠️", border: "2px solid #ffc107", time: timeText };
         }
-        return { color: "#dc3545", text: "Critical issue", icon: "❌", border: "2px solid #dc3545", time: diffMinutes };
+
+        return { color: "#dc3545", text: "Critical issue", icon: "❌", border: "2px solid #dc3545", time: timeText };
     });
+
 
     return {
         filteredLogs,

@@ -134,28 +134,20 @@ const props = defineProps({
   }
 }
 
-
 .statistics-panel {
-  width: 31%;
-  max-width: 51vh;
+  width: 30%;
+  max-width: 50vw;
   height: 100%;
-  margin: auto;
   background: linear-gradient(to bottom right, #1e1e1e, #2a2a2a);
   color: #ffffff;
   padding: 2rem;
   border-radius: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 h2 {
   font-size: 1.75rem;
   text-align: center;
   margin-bottom: 1.5rem;
-}
-
-.loading {
-  text-align: center;
-  font-size: 1.2rem;
 }
 
 .stats-grid {
@@ -169,15 +161,12 @@ h2 {
   background: #292929;
   border-radius: 1rem;
   padding: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   align-items: flex-start;
   gap: 1rem;
   transition: transform 0.2s ease;
 }
 
-.stat-card:hover {
-  transform: translateY(-2px);
-}
+
 
 .emoji {
   font-size: 2rem;

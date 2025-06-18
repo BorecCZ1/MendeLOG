@@ -14,13 +14,15 @@ import {RouterLink} from 'vue-router';
 </template>
 
 <style scoped>
+
 .sidebar {
-  width: 15%;
+  width: 15vw;
   height: 100vh;
   background: linear-gradient(200deg, rgba(44, 62, 80, 0.89), rgba(26, 188, 156, 0.76));
   color: #ecf0f1;
   padding: 2vh;
   position: fixed;
+  grid-column: 1;
   top: 0;
   left: 0;
   display: flex;
@@ -87,4 +89,5 @@ nav .nav-item:active {
   margin: 0 auto;
   border-radius: 5vh;
 }
+
 </style>

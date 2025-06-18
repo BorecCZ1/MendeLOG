@@ -173,3 +173,4 @@ cython_debug/
 .idea/
 
 backend/mendelog-c2fd0-firebase-adminsdk-fbsvc-e26756fdd5.json
+/backend/.idea/

@@ -7,27 +7,26 @@ const props = defineProps<{ logs: Article[] }>();
 
 <template>
   <div class="recent-logs">
-    <h2>Recent Logs</h2>
     <div v-if="props.logs.length">
-      <ArticleComponent v-for="log in props.logs" :key="log.articles_id" :log="log" />
+      <ArticleComponent v-for="log in props.logs.slice(0, 4)" :key="log.articles_id" :log="log" />
     </div>
     <p v-else class="loading-spinner"></p>
   </div>
 </template>
 
-
 <style scoped>
 
 h2 {
-  color: white;
   font-weight: 400;
 }
 
 .recent-logs {
-  width: 100%;
-  max-width: 90%;
-  margin: auto;
+  width: 90%;
+  border-radius: 1vh;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
 }
 
 .loading-spinner {

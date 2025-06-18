@@ -64,13 +64,13 @@ export const useChartService = () => {
             labels: sortedLabels,
             datasets: [
                 {
-                    label: 'Zpracované články',
+                    label: 'Processed articles',
                     data: processedValues,
                     backgroundColor: processedValues.map(getDynamicColor),
                     stack: 'stack1',
                 },
                 {
-                    label: 'Nezpracované články',
+                    label: 'Unprocessed articles',
                     data: unprocessedValues,
                     backgroundColor: 'rgba(101, 101, 101, 0.9)',
                     stack: 'stack1',
@@ -118,14 +118,14 @@ export const useChartService = () => {
                         stacked: true,
                         title: {
                             display: true,
-                            text: 'Čas (hodiny)'
+                            text: 'Timeline'
                         }
                     },
                     y: {
                         stacked: true,
                         title: {
                             display: true,
-                            text: 'Počet článků'
+                            text: 'Number of articles'
                         },
                         beginAtZero: true
                     }

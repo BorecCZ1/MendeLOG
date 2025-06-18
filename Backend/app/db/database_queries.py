@@ -60,7 +60,7 @@ async def refresh_materialized_view_if_needed():
                 should_refresh = True
             else:
                 age = datetime.now(timezone.utc) - latest_retrieved_at
-                should_refresh = age > timedelta(minutes=100000) #TODO změnit na požadovaný počet minut
+                should_refresh = age > timedelta(minutes=10000000) #TODO změnit na požadovaný počet minut
 
             if should_refresh:
                 print("🔁 Obnovuju materialized view")

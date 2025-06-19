@@ -58,16 +58,18 @@ onMounted(async () => {
 .right-section {
   display: flex;
   flex-direction: column;
-  gap: 2vh;
   height: 100%;
 }
 
 .left-section {
   flex: 3;
+  gap: 5vh;
 }
 
 .right-section {
   flex: 2;
+  gap: 2vh;
+
 }
 
 .logs{

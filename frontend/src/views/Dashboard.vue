@@ -43,6 +43,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+
 .dashboard {
   display: flex;
   flex-direction: row;

@@ -18,7 +18,7 @@ const props = defineProps({
         <div class="shimmer-text shimmer short"></div>
         <div class="shimmer-text shimmer long"></div>
       </div>
-      <p class="loading-text">⌛ Načítáme statistiky... prosím o moment 🌐</p>
+      <p class="loading-text">⌛ Loading statistics... please wait 🌐</p>
     </div>
 
 

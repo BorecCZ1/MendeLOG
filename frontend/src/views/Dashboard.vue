@@ -57,8 +57,7 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  gap: 2vh;
-  padding: 2vh;
+  padding: 1vh 1vh 2vh;
   overflow: hidden;
 }
 
@@ -66,7 +65,7 @@ onMounted(async () => {
   flex: 3;
   display: flex;
   flex-direction: column;
-  gap: 6vh;
+  gap: 1vh;
 }
 
 .chart {

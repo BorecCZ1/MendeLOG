@@ -23,7 +23,6 @@ import Sidebar from './components/navigation/Sidebar.vue';
 
 .content {
   flex-grow: 1;
-  padding: 2vh;
   overflow-x: hidden;
   width: calc(100% - 15vw);
   grid-column: 2;

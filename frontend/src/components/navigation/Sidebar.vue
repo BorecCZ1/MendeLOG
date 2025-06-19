@@ -41,6 +41,19 @@ import {RouterLink} from 'vue-router';
   font-family: 'Roboto', sans-serif;
   text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   transition: text-shadow 0.3s ease;
+
+}
+
+@media (max-width: 1800px) {
+  .title{
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 1400px) {
+  .title{
+    font-size: 1.5rem;
+  }
 }
 
 nav {

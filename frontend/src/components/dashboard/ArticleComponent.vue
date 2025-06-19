@@ -27,6 +27,9 @@ const showTitle = route.path !== '/';
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
+}
+
+.log-item:not(:last-child) {
   border-bottom: 1px solid #ddd;
 }
 

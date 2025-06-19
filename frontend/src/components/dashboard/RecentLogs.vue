@@ -16,9 +16,9 @@ const badLogs = computed(() => {
 
 <template>
   <div class="recent-logs">
-    <div v-if="logs.length">
+    <div v-if="badLogs.length">
       <ArticleComponent
-          v-for="log in logs.slice(0, 4)"
+          v-for="log in badLogs.slice(0, 4)"
           :key="log.articles_id"
           :log="log"
       />

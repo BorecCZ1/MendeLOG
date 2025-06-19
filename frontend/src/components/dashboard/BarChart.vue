@@ -48,11 +48,6 @@ watch(() => filteredLogs.value, render, { deep: true });
 
 <style scoped>
 
-canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
 .chart-wrapper {
   position: relative;
   width: 85%;

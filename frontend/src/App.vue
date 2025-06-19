@@ -19,6 +19,7 @@ import Sidebar from './components/navigation/Sidebar.vue';
   width: 100vw;
   padding-left: 15vw;
   box-sizing: border-box;
+  background: #181818;
 }
 
 .content {

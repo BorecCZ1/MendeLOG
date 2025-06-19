@@ -102,6 +102,7 @@ watch(() => filteredLogs.value, render, { deep: true });
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
   padding: 1vh;
+  color: white;
 }
 
 </style>

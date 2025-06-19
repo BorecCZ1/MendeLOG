@@ -19,6 +19,7 @@ onMounted(async () => {
   isLoading.value = false;
 });
 </script>
+
 <template>
   <div class="dashboard">
     <div class="left-section">
@@ -46,7 +47,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: calc(100vh - 2vh); /* Kompenzace za padding */
+  height: 100vh;
   box-sizing: border-box;
   padding: 1vh;
   overflow: hidden;
@@ -69,8 +70,16 @@ onMounted(async () => {
   flex: 2;
 }
 
+.logs{
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  text-align: center;
+}
+
 .chart,
-.logs,
 .status {
   flex: 1;
   display: flex;
